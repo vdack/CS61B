@@ -4,6 +4,7 @@ public class CheckLabConfig {
 	public static void checkConfig(boolean isWindows) {
 		String repoVariableName = "REPO_DIR";
 		String repoDir = System.getenv(repoVariableName);
+//		System.out.println(repoDir);
 		checkVariableNotNull(repoDir, repoVariableName);
 		System.out.println("Validating your " + repoVariableName + 
 			               " environment variable, which is currently set to: " +
