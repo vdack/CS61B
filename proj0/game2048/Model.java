@@ -1,5 +1,6 @@
 package game2048;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.Observable;
 
@@ -109,11 +110,51 @@ public class Model extends Observable {
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
+        int deltaScore = 0;
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
 
+        int wall = this.board.size() ;
+
+        this.board.setViewingPerspective(side);
+        for (int currentCol = 0; currentCol < wall; currentCol++){
+            ArrayList<Integer> mergedList = new ArrayList<>();
+            for (int currentRow = wall - 1; currentRow >= 0; currentRow--){
+                Tile t = this.board.tile(currentCol,currentRow);
+                if (t == null) continue;
+
+                int dstRow = currentRow;
+                while (dstRow < wall - 1){
+                    Tile nextT = this.board.tile(currentCol, dstRow + 1);
+                    if (nextT == null) dstRow++;
+                    else break;
+                }
+                if (dstRow == wall - 1){
+                    this.board.move(currentCol, dstRow, t);
+                    if(dstRow != currentRow) changed = true;
+                    continue;
+                }
+                Tile adjTile = this.board.tile(currentCol, dstRow + 1);
+                if (adjTile.value() == t.value() && (!mergedList.contains(dstRow + 1))){
+                    this.board.move(currentCol, dstRow + 1, t);
+                    changed = true;
+                    adjTile.merge(currentCol, dstRow + 1, t);
+                    mergedList.add(dstRow + 1);
+                    deltaScore += adjTile.next().value();
+                }
+                else{
+                    this.board.move(currentCol, dstRow, t);
+                    changed = true;
+                }
+            }
+
+        }
+
+        this.board.setViewingPerspective(Side.NORTH);
+
+        this.score += deltaScore;
+//        maxScore = maxScore > score? maxScore:score;
         checkGameOver();
         if (changed) {
             setChanged();
@@ -137,7 +178,13 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
+        // Finished!
+        int boardSize = b.size();
+        for (int i = 0; i < boardSize; i++){
+            for (int j = 0; j < boardSize; j++){
+                if (b.tile(i, j) == null)return true;
+            }
+        }
         return false;
     }
 
@@ -147,7 +194,13 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
+        // Finished!
+        int boardSize = b.size();
+        for (int i = 0; i < boardSize; i++){
+            for (int j = 0; j < boardSize; j++){
+                if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE )return true;
+            }
+        }
         return false;
     }
 
@@ -158,7 +211,23 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        // Finished!
+        if (emptySpaceExists(b)) return true;
+
+        int boardSize = b.size();
+        for (int i = 0; i < boardSize - 1; i++){
+            for (int j = 0; j < boardSize - 1; j++){
+                int cValue = b.tile(i, j).value();
+                int southValue = b.tile(i + 1, j).value();
+                int eastValue = b.tile(i, j + 1).value();
+                if (cValue == southValue || cValue == eastValue)return true;
+            }
+            int northValue = b.tile(boardSize - 1, i).value();
+            int southValue = b.tile(boardSize - 1, i + 1).value();
+            int westValue = b.tile(i , boardSize - 1).value();
+            int eastValue = b.tile(i + 1, boardSize - 1).value();
+            if (northValue == southValue || westValue == eastValue) return true;
+        }
         return false;
     }
 
