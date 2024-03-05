@@ -61,12 +61,11 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
         size += 1;
     }
 
-    @Override
+
     public T getFirst() {
         return sentinel.rightNode.val;
     }
 
-    @Override
     public T getLast() {
         return sentinel.leftNode.val;
     }
@@ -143,6 +142,13 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
     }
     public Iterator<T> iterator(){
         return new LLDIterator();
+    }
+
+    public void printDeque(){
+        for (int i = 0; i < this.size(); i++){
+            System.out.print(this.get(i) + " ");
+        }
+        System.out.println("");
     }
 
 }
