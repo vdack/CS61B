@@ -17,16 +17,21 @@ public class ArrayDeque<Item> implements Deque<Item>{
 
     }
     private void resize(){
+        int nextCapacity;
         if (size < capacity/4 && capacity >=16){
-            capacity /= 4;
+            nextCapacity = capacity / 4;
         }
         else{
-            capacity *= 2;
+            nextCapacity = capacity * 2;
         }
-        Item[] a = (Item[]) new Object[capacity];
-        System.arraycopy(innerArray, head, a, 0, size);
+        Item[] a = (Item[]) new Object[nextCapacity];
+        for (int i = 0; i < size; i++){
+            a[i] = get(i);
+        }
+//        System.arraycopy(innerArray, 0, a, 0, size);
         innerArray = a;
-        head = 0;
+        capacity = nextCapacity;
+        head = (capacity-1)%capacity;
         tail = size;
     }
 //    private int getHeadPosition(){
