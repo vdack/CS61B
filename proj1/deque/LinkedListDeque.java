@@ -2,12 +2,12 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Item> implements  Deque<Item>{
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
     private class Node {
         /*
         from left to right
          */
-        Item val;
+        T val;
         Node leftNode;
         Node rightNode;
         public Node(){
@@ -15,13 +15,13 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
             leftNode = null;
             rightNode = null;
         }
-        public Node(Item value){
+        public Node(T value){
             this.val = value;
             leftNode = null;
             rightNode = null;
         }
 
-        public Node(Item value, Node lnode, Node rnode){
+        public Node(T value, Node lnode, Node rnode){
             this.val = value;
             this.rightNode = rnode;
             rnode.leftNode = this;
@@ -41,7 +41,7 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
     }
 
     @Override
-    public void addFirst(Item element) {
+    public void addFirst(T element) {
         Node left = sentinel;
         Node right = sentinel.rightNode;
         Node current = new Node(element, left, right);
@@ -54,7 +54,7 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
     }
 
     @Override
-    public void addLast(Item element) {
+    public void addLast(T element) {
         Node left = sentinel.leftNode;
         Node right = sentinel;
         Node current = new Node(element, left, right);
@@ -62,17 +62,17 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
     }
 
     @Override
-    public Item getFirst() {
+    public T getFirst() {
         return sentinel.rightNode.val;
     }
 
     @Override
-    public Item getLast() {
+    public T getLast() {
         return sentinel.leftNode.val;
     }
 
     @Override
-    public Item removeFirst() {
+    public T removeFirst() {
         if (size == 0)return null;
         Node tempNode = sentinel.rightNode;
         sentinel.rightNode = tempNode.rightNode;
@@ -81,7 +81,7 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
         return tempNode.val;
     }
     @Override
-    public Item removeLast() {
+    public T removeLast() {
         if (size == 0)return null;
         Node tempNode = sentinel.leftNode;
         sentinel.leftNode = tempNode.leftNode;
@@ -90,16 +90,16 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
         return tempNode.val;
     }
 
-    public Item getRecursive(int index){
+    public T getRecursive(int index){
         if (index < 0 || index >= this.size())return null;
         return getRecurHelper(sentinel.rightNode, index);
     }
-    private Item getRecurHelper(Node currentNode, int counter){
+    private T getRecurHelper(Node currentNode, int counter){
         if (counter == 0)return currentNode.val;
         return getRecurHelper(currentNode.rightNode, counter - 1);
     }
     @Override
-    public Item get(int index) {
+    public T get(int index) {
         if (index < 0 || index >= this.size())return null;
         Node currentNode = sentinel.rightNode;
         while (index > 0){
@@ -117,14 +117,14 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
         if (((Deque<?>) o).size() != this.size())return false;
         if (this.size() == 0) return true; //HERE I AM NOT SURE.
         for (int i = 0; i < this.size(); i++){
-            Item e1 = this.get(i);
-            Item e2 = (Item) ((Deque<?>) o).get(i);
+            T e1 = this.get(i);
+            T e2 = (T) ((Deque<?>) o).get(i);
             if (!e1.equals(e2))return false;
         }
         return true;
     }
 
-    private class LLDIterator implements Iterator<Item>{
+    private class LLDIterator implements Iterator<T>{
         int posi;
         public LLDIterator(){
             posi = 0;
@@ -135,11 +135,11 @@ public class LinkedListDeque<Item> implements  Deque<Item>{
         }
 
         @Override
-        public Item next() {
+        public T next() {
             return get(posi);
         }
     }
-    public Iterator<Item> iterator(){
+    public Iterator<T> iterator(){
         return new LLDIterator();
     }
 
