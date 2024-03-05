@@ -50,9 +50,10 @@ public class GuitarString {
      */
     public void tic() {
         double num1 = buffer.removeLast();
-        double num2 = buffer.getLast();
+        double num2 = buffer.removeLast();
         double newNum = (num1 + num2) * DECAY / 2;
         buffer.addFirst(newNum);
+        buffer.addLast(num2);
     }
 
     /* Return the double at the front of the buffer. */
