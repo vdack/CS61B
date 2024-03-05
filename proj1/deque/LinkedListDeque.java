@@ -136,7 +136,9 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T>{
 
         @Override
         public T next() {
-            return get(posi);
+            T element = get(posi);
+            posi += 1;
+            return element;
         }
     }
     public Iterator<T> iterator(){

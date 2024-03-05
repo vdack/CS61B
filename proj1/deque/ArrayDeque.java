@@ -123,10 +123,19 @@ public class ArrayDeque<T> implements Deque<T> ,Iterable<T>{
 
         @Override
         public T next() {
-            return get(offset);
+            T element = get(offset);
+            offset += 1;
+            return element;
         }
     }
     public Iterator<T> iterator(){
         return new ADIterator();
+    }
+    @Override
+    public void printDeque(){
+        for (int i = 0; i < this.size(); i++){
+            System.out.print(this.get(i) + " ");
+        }
+        System.out.println("");
     }
 }
