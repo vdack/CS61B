@@ -7,32 +7,32 @@ import org.junit.Test;
 public class FlikTest {
 
     @Test
-    public void TestOneToNine(){
-        for (int i = -10; i < 10; i++){
+    public void testOneToNine() {
+        for (int i = -10; i < 10; i++) {
             Integer numA = i;
             Integer numB = i;
-            Integer numC = i+1;
-            assertTrue(Flik.isSameNumber(numA,numB));
-            assertFalse(Flik.isSameNumber(numA,numC));
+            Integer numC = i + 1;
+            assertTrue(Flik.isSameNumber(numA, numB));
+            assertFalse(Flik.isSameNumber(numA, numC));
         }
     }
 
     @Test
-    public void TestGreaterThanThousand(){
-        for (int i = 1; i < 30; i+=7){
+    public void testGreaterThanThousand() {
+        for (int i = 1; i < 30; i+=7) {
             Integer x = i * 1453;
             Integer y = i * 1453;
             Integer z = i * 1644;
-            assertTrue(Flik.isSameNumber(x,y));
-            assertFalse(Flik.isSameNumber(y,z));
+            assertTrue(Flik.isSameNumber(x, y));
+            assertFalse(Flik.isSameNumber(y, z));
         }
     }
 
     @Test
-    public void TestRandom(){
-        for (int i = 0 ;i < 64; i++){
+    public void testRandom() {
+        for (int i = 0 ;i < 64; i++) {
             int n = StdRandom.uniform(14530529);
-            if (n % 2 == 0){
+            if (n % 2 == 0) {
                 Integer x = n;
                 Integer y = n;
                 x = x + 1;
