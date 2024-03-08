@@ -19,7 +19,7 @@ public class FlikTest {
 
     @Test
     public void testGreaterThanThousand() {
-        for (int i = 1; i < 30; i+=7) {
+        for (int i = 1; i < 30; i += 7) {
             Integer x = i * 1453;
             Integer y = i * 1453;
             Integer z = i * 1644;
@@ -30,7 +30,7 @@ public class FlikTest {
 
     @Test
     public void testRandom() {
-        for (int i = 0 ;i < 64; i++) {
+        for (int i = 0; i < 64; i++) {
             int n = StdRandom.uniform(14530529);
             if (n % 2 == 0) {
                 Integer x = n;
@@ -38,7 +38,7 @@ public class FlikTest {
                 x = x + 1;
                 y = y + 1;
                 assertTrue(Flik.isSameNumber(x, y));
-            } else{
+            } else {
                 Integer x = n;
                 Integer y = n;
                 x = x - 1;
