@@ -23,12 +23,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             key = k;
             value = v;
         }
-
-        @Override
-        public boolean equals(Object obj) {
-            Node anotherNode = (Node)obj;
-            return key.equals(anotherNode.key);
-        }
     }
 
     /* Instance Variables */
@@ -119,7 +113,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     }
 
 
-    protected Node findKeyValueInBucket(K key, Collection<Node> bucket){
+    private Node findKeyValueInBucket(K key, Collection<Node> bucket){
         for (Node node: bucket) {
             if (node.key.equals(key)) {
                 return node;
@@ -127,7 +121,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         }
         return null;
     }
-    protected Collection<Node> getBucket(K key) {
+    private Collection<Node> getBucket(K key) {
         int hashCode = (key.hashCode() % capacity + capacity) % capacity;
         Collection<Node> bucket = buckets[hashCode];
         return bucket;
@@ -187,7 +181,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         if (findKeyValueInBucket(key, bucket) != null) {
             Collection<Node> updatedBucket = createBucket();
             for (Node node : bucket) {
-                if (node.key == key) {
+                if (node.key.equals(key)) {
                     updatedBucket.add(addedNode);
                 } else {
                     updatedBucket.add(node);
