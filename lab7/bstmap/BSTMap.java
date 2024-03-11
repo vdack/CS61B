@@ -1,26 +1,73 @@
 package bstmap;
 
+import edu.princeton.cs.algs4.StdRandom;
+
 import java.util.*;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
     //here are methods do not need to implement.
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
-//        if (this.root == null) {
-//            return null;
-//        }
-//        btNode parentNode = root.findParentNode(key);
-//        btNode foundNode = parentNode.leftNode;
-//        if (foundNode != null && foundNode.key.equals(key)) {
-//            parentNode.leftNode = null
-//        }
+//        throw new UnsupportedOperationException();
+        if (this.size == 0) {
+            return null;
+        }
+        if (this.size == 1) {
+            V removedValue = this.root.val;
+            this.root = null;
+            this.size = 0;
+            return removedValue;
+        }
+        btNode parentNode = root.findParentNode(key);
+        btNode foundNode;
+        V removedValue;
+        if (parentNode == null) {//remove root
+            foundNode = root;
+            removedValue = foundNode.val;
+            root.switchKeyVal(foundNode.moveRandomLeaf());
+            root.modifyNode();
 
+        } else if (parentNode.leftNode != null && parentNode.leftNode.key.equals(key)) {//is left node
+            foundNode = parentNode.leftNode;
+            removedValue = foundNode.val;
+            if (foundNode.isLeaf()) {
+                parentNode.leftNode = null;
+            } else {
+                parentNode.leftNode.switchKeyVal(foundNode.moveRandomLeaf());
+                parentNode.leftNode.modifyNode();
+            }
+
+        } else if (parentNode.rightNode != null && parentNode.rightNode.key.equals(key)) {//is right node
+            foundNode = parentNode.rightNode;
+            removedValue = foundNode.val;
+            if (foundNode.isLeaf()) {
+                parentNode.rightNode = null;
+            } else {
+                parentNode.rightNode.switchKeyVal(foundNode.moveRandomLeaf());
+                parentNode.rightNode.modifyNode();
+            }
+        } else {
+            return null;
+        }
+        size -= 1;
+        return removedValue;
     }
 
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        if (this.size == 0) {
+            return null;
+        }
+        if (this.size == 1) {
+            V removedValue = this.root.val;
+            this.root = null;
+            this.size = 0;
+            return removedValue;
+        }
+        if (value.equals(this.get(key))) {
+            return remove(key);
+        }
+        return null;
     }
 
     private class BSTIterator implements Iterator<K> {
@@ -131,6 +178,62 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             return lst;
         }
 
+        private boolean isLeaf(){
+            return this.leftNode == null && this.rightNode == null;
+        }
+        public btNode moveRandomLeaf(){
+            if (this.isLeaf()) {
+                if (this.parentNode.leftNode != null && this.parentNode.leftNode.key.equals(this.key)) {
+                    this.parentNode.leftNode = null;
+                } else {
+                    this.parentNode.rightNode = null;
+                }
+                return this;
+            }
+            if (this.leftNode == null) {
+                return this.rightNode.moveRandomLeaf();
+            }
+            if (this.rightNode == null) {
+                return this.leftNode.moveRandomLeaf();
+            }
+            int r = StdRandom.uniform(2);
+            if (r == 0) {
+                return this.leftNode.moveRandomLeaf();
+            } else {
+                return this.rightNode.moveRandomLeaf();
+            }
+        }
+
+        public void switchKeyVal(btNode anotherNode) {
+            K k = anotherNode.key;
+            V v = anotherNode.val;
+            anotherNode.key = this.key;
+            anotherNode.val = this.val;
+            this.key = k;
+            this.val = v;
+        }
+        public void modifyNode(){
+            if (leftNode != null && key.compareTo(leftNode.key) <= 0) {
+                this.switchKeyVal(leftNode);
+                leftNode.modifyNode();
+            } else if (rightNode != null && key.compareTo(rightNode.key) >= 0) {
+                this.switchKeyVal(rightNode);
+                rightNode.modifyNode();
+            }
+        }
+
+        public String toStringInOrder(){
+            String lstr = "LEAF";
+            String rstr = "LEAF";
+            if (leftNode != null) {
+                lstr = leftNode.toStringInOrder();
+            }
+            if (rightNode != null) {
+                rstr = rightNode.toStringInOrder();
+            }
+            return "Node: (key: " + key.toString() + ") (value: " + val.toString() + ") (left: " + lstr + ") (right: " + rstr + ")";
+        }
+
     }
     private btNode root;
     private int size;
@@ -185,5 +288,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         }
         btNode foundNode = this.root.findNode(key);
         return foundNode != null;
+    }
+
+    public void printInOrder(){
+        if (this.root == null) {
+            System.out.println("");
+        }
+        System.out.println(this.root.toStringInOrder());
     }
 }
