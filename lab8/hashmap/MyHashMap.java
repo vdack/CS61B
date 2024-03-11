@@ -278,11 +278,35 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
-        throw new UnsupportedOperationException();
+        int hashCode = (key.hashCode() % capacity + capacity) % capacity;
+        Collection<Node> bucket = buckets[hashCode];
+        if (bucket == null) {
+            return null;
+        }
+        V value = null;
+        Collection<Node> updateBucket = createBucket();
+        for (Node node : bucket) {
+            if (node.key == key) {
+                value = node.value;
+                continue;
+            }
+            updateBucket.add(node);
+        }
+        if (updateBucket.size() == 0){
+            buckets[hashCode] = null;
+        } else {
+            buckets[hashCode] = updateBucket;
+        }
+        return value;
     }
 
     @Override
     public V remove(K key, V value) {
-        throw new UnsupportedOperationException();
+        Collection<Node> bucket = getBucket(key);
+        Node node = findKeyValueInBucket(key, bucket);
+        if (node.value == value) {
+            return remove(key);
+        }
+        return null;
     }
 }
