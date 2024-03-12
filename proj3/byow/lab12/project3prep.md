@@ -1,5 +1,7 @@
 # Project 3 Prep
 
+**ANYHOW I MANAGED TO FINISH IT.**
+
 **For tessellating hexagons, one of the hardest parts is figuring out where to place each hexagon/how to easily place hexagons on screen in an algorithmic way.
 After looking at your own implementation, consider the implementation provided near the end of the lab.
 How did your implementation differ from the given one? What lessons can be learned from it?**
