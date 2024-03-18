@@ -284,8 +284,8 @@ Engine {
         Long seedNumber = Long.parseLong(input.substring(1,input.length()-1),10);
 //        System.out.println("current world seed is :" + seedNumber);
 
-        TERenderer ter = new TERenderer();
-        ter.initialize(WIDTH, HEIGHT);
+//        TERenderer ter = new TERenderer();
+//        ter.initialize(WIDTH, HEIGHT);
 
         // initialize tiles
         finalWorldFrame = new TETile[WIDTH][HEIGHT];
@@ -300,7 +300,7 @@ Engine {
         drawRoads(roads, finalWorldFrame);
 //        rooms = null;
         // draws the world to the screen
-        ter.renderFrame(finalWorldFrame);
+//        ter.renderFrame(finalWorldFrame);
         return finalWorldFrame;
     }
 }
