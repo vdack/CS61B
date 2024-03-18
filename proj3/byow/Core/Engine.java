@@ -282,7 +282,7 @@ Engine {
         assert (input.length() > 2 && input.charAt(0) == 'N' && input.charAt(input.length()-1) == 'S');
 
         Integer seedNumber = Integer.parseInt(input.substring(1,input.length()-1));
-        System.out.println("current world seed is :" + seedNumber);
+//        System.out.println("current world seed is :" + seedNumber);
 
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
