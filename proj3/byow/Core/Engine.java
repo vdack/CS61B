@@ -279,9 +279,9 @@ Engine {
 
         TETile[][] finalWorldFrame = null;
 
-        assert (input.length() > 2 && input.charAt(0) == 'N' && input.charAt(input.length()-1) == 'S');
+//        assert (input.length() > 2 && input.charAt(0) == 'n' && input.charAt(input.length()-1) == 's');
 
-        Integer seedNumber = Integer.parseInt(input.substring(1,input.length()-1));
+        Long seedNumber = Long.parseLong(input.substring(1,input.length()-1),10);
 //        System.out.println("current world seed is :" + seedNumber);
 
         TERenderer ter = new TERenderer();
