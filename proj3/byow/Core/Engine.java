@@ -1,9 +1,14 @@
 package byow.Core;
 
+import antlr.StringUtils;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
+import byow.InputDemo.InputSource;
+import byow.InputDemo.StringInputDevice;
+import byow.InputDemo.KeyboardInputSource;
 
+import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -17,11 +22,52 @@ Engine {
     public static final int WIDTH_OFFSET = 10;
     public static final int HEIGHT_OFFSET = 5;
 
+    private static final int MENU_MODE = 0;
+    private static final int GAME_MODE = 1;
+    private static final int SEED_MODE = 2;
+
+    //initial interface
+    private TETile[][] menu() {
+        TETile[][] world = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                world[x][y] = Tileset.NOTHING;
+            }
+        }
+        world[30][50] = Tileset.FLOWER;
+        world[60][50] = Tileset.MOUNTAIN;
+        world[90][50] = Tileset.WATER;
+        return world;
+    }
+
+
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        TETile[][] finalWorldFrame = null;
+        Random r = new Random();
+        Long seedNumber = r.nextLong();
+        System.out.println("current world seed is :" + seedNumber);
+
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
+
+        // initialize tiles
+        finalWorldFrame = new TETile[WIDTH][HEIGHT];
+        for (int x = 0; x < WIDTH; x += 1) {
+            for (int y = 0; y < HEIGHT; y += 1) {
+                finalWorldFrame[x][y] = Tileset.NOTHING;
+            }
+        }
+        Room[][] rooms = constructRooms(seedNumber);
+        drawRooms(finalWorldFrame, rooms);
+        List<Road> roads = constructRoads(rooms);
+        drawRoads(roads, finalWorldFrame);
+        ter.renderFrame(finalWorldFrame);
+
+
     }
 
 
@@ -246,6 +292,41 @@ Engine {
         }
 
     }
+    private void drawEntities(List<Entity> entities, TETile[][] world) {
+        for (Entity entity : entities) {
+            Position position = entity.getCurrentPosition();
+            world[position.getX()][position.getY()] = Tileset.AVATAR;
+        }
+    }
+    private Avator placeAvator(TETile[][] world){
+        for (int i = 0; i < WIDTH; i += 1) {
+            for (int j = 0; j < HEIGHT; j += 1) {
+                if (world[i][j] == Tileset.FLOOR) {
+                    return new Avator(new Position(i, j), Tileset.FLOOR);
+                }
+            }
+        }
+        return new Avator(new Position(32,32), Tileset.FLOOR);
+    }
+
+    private boolean movable(Entity entity, TETile tile) {
+        return tile == Tileset.FLOOR;
+    }
+    private void tryMove(Entity entity,TETile[][] world, int deltaX, int deltaY) {
+        Position position = entity.getCurrentPosition();
+        int x = position.getX();
+        int y = position.getY();
+        if (!movable(entity, world[x + deltaX][y + deltaY])) {
+            return;
+        }
+        world[x][y] = entity.getTileBeneath();
+        entity.moveTo(x + deltaX, y + deltaY, world[x + deltaX][y + deltaY]);
+        System.out.println("move!");
+    }
+
+    private void saveAndQuit() {
+
+    }
 
     /**
      * Method used for autograding and testing your code. The input string will be a series
@@ -269,7 +350,6 @@ Engine {
      * @return the 2D TETile[][] representing the state of the world
      */
     public TETile[][] interactWithInputString(String input) {
-        // TODO: Fill out this method so that it run the engine using the input
         // passed in as an argument, and return a 2D tile representation of the
         // world that would have been drawn if the same inputs had been given
         // to interactWithKeyboard().
@@ -277,30 +357,71 @@ Engine {
         // See proj3.byow.InputDemo for a demo of how you can make a nice clean interface
         // that works for many different input types.
 
-        TETile[][] finalWorldFrame = null;
+        int controlMode = MENU_MODE;
+        TETile[][] finalWorldFrame = menu();
+        Entity avator = null;
+        List<Entity> entities = null;
+        TERenderer ter = new TERenderer();
+        ter.initialize(WIDTH, HEIGHT);
 
-//        assert (input.length() > 2 && input.charAt(0) == 'n' && input.charAt(input.length()-1) == 's');
+        InputSource inputSource = new StringInputDevice(input.toUpperCase());
+        while (inputSource.possibleNextInput()) {
+            char opKey = inputSource.getNextKey();
+            if (controlMode == MENU_MODE) {
+                if (opKey == 'N') {
+                    controlMode = SEED_MODE;
+                } else if (opKey == 'L') {
+                    //TODO load game.
+                } else if (opKey == 'Q') {
+                    //TODO save and exit game.
+                } else{
+                    //Nothing
+                }
+            } else if (controlMode == GAME_MODE) {
+                if (opKey == 'W') {
+                    tryMove(avator, finalWorldFrame, 0 ,1);
+                } else if (opKey == 'S') {
+                    tryMove(avator, finalWorldFrame, 0 ,-1);
+                } else if (opKey == 'A') {
+                    tryMove(avator, finalWorldFrame, -1 ,0);
+                } else if (opKey == 'D') {
+                    tryMove(avator, finalWorldFrame, 1 ,0);
+                } else if (opKey == ':'){
+                    controlMode = MENU_MODE;
+                } else {
+                    //nothing
+                }
+                drawEntities(entities,finalWorldFrame);
 
-        Long seedNumber = Long.parseLong(input.substring(1,input.length()-1),10);
-//        System.out.println("current world seed is :" + seedNumber);
-
-//        TERenderer ter = new TERenderer();
-//        ter.initialize(WIDTH, HEIGHT);
-
-        // initialize tiles
-        finalWorldFrame = new TETile[WIDTH][HEIGHT];
-        for (int x = 0; x < WIDTH; x += 1) {
-            for (int y = 0; y < HEIGHT; y += 1) {
-                finalWorldFrame[x][y] = Tileset.NOTHING;
+            } else if (controlMode == SEED_MODE) {
+                //get seed number
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append(opKey);
+                while (inputSource.possibleNextInput()) {
+                    char possibleNumber = inputSource.getNextKey();
+                    if (possibleNumber == 'S') {
+                        break;
+                    }
+                    stringBuilder.append(possibleNumber);
+                }
+                Long seedNumber = Long.parseLong(stringBuilder.toString(),10);
+                System.out.println("current world seed is :" + seedNumber);
+                Room[][] rooms = constructRooms(seedNumber);
+                drawRooms(finalWorldFrame, rooms);
+                List<Road> roads = constructRoads(rooms);
+                drawRoads(roads, finalWorldFrame);
+                avator = placeAvator(finalWorldFrame);
+                entities = new ArrayList<>();
+                entities.add(avator);
+                drawEntities(entities, finalWorldFrame);
+                controlMode = GAME_MODE;
             }
+            else {
+                continue;
+            }
+            ter.renderFrame(finalWorldFrame);
         }
-        Room[][] rooms = constructRooms(seedNumber);
-        drawRooms(finalWorldFrame, rooms);
-        List<Road> roads = constructRoads(rooms);
-        drawRoads(roads, finalWorldFrame);
-//        rooms = null;
-        // draws the world to the screen
-//        ter.renderFrame(finalWorldFrame);
+
         return finalWorldFrame;
     }
 }
