@@ -44,7 +44,6 @@ public class World {
             }
         }
         avator = null;
-        System.out.println("Status: world cleared.");
     }
 
     private Room[][] constructRooms() {
@@ -65,7 +64,6 @@ public class World {
                 rooms[i][j] = new Room(widthOffset + i * 25, heightOffset + j* 25, i, j, r.nextLong());
             }
         }
-        System.out.println("Status: rooms constructed.");
         return rooms;
     }
     private void setRooms(Room[][] rooms) {
@@ -98,7 +96,6 @@ public class World {
 //                world[room.getRightDoorPosition().getX()][room.getRightDoorPosition().getY()] = Tileset.UNLOCKED_DOOR;
             }
         }
-        System.out.println("Status: rooms set");
     }
     private Room getNeibourghRoom(int indexI, int indexJ, Room[][] rooms) {
         if (indexI < 0 || indexJ < 0 || indexI > 3 || indexJ > 2) {
@@ -196,7 +193,6 @@ public class World {
                 roads.addAll(findRoads(rooms[0][0].getRightDoorPosition(), rooms[i][j].getLeftDoorPosition()));
             }
         }
-        System.out.println("Status: roads constructed.");
         return roads;
     }
 
@@ -249,7 +245,6 @@ public class World {
                 }
             }
         }
-        System.out.println("Status: roads set.");
     }
     private void setAvator() {
         for (int i = 0; i < width; i += 1) {
@@ -257,7 +252,6 @@ public class World {
                 if (world[i][j] == Tileset.FLOOR) {
                     avator =  new Avator(new Position(i, j), Tileset.FLOOR);
                     world[i][j] = Tileset.AVATAR;
-                    System.out.println("Status: avator set.");
                     return;
                 }
             }
@@ -315,40 +309,17 @@ public class World {
         setAvator();
     }
     public void avatorMoveUp() {
-        String strLog;
-        if (tryMove(0, 1, avator)) {
-            strLog = "Status: avator move up successfully.";
-        } else {
-            strLog = "Status: avator fail to move up.";
-        }
-        System.out.println(strLog);
+        tryMove(0, 1, avator);
     }
     public void avatorMoveDown() {
-        String strLog;
-        if (tryMove(0, -1, avator)) {
-            strLog = "Status: avator move down successfully.";
-        } else {
-            strLog = "Status: avator fail to move down.";
-        }
-        System.out.println(strLog);
+        tryMove(0, -1, avator);
+
     }
     public void avatorMoveLeft() {
-        String strLog;
-        if (tryMove(-1, 0, avator)) {
-            strLog = "Status: avator move left successfully.";
-        } else {
-            strLog = "Status: avator fail to move left.";
-        }
-        System.out.println(strLog);
+        tryMove(-1, 0, avator);
     }
     public void avatorMoveRight() {
-        String strLog;
-        if (tryMove(1, 0, avator)) {
-            strLog = "Status: avator move right successfully.";
-        } else {
-            strLog = "Status: avator fail to move right.";
-        }
-        System.out.println(strLog);
+        tryMove(1, 0, avator);
     }
 
     public void saveWorld(String savingName) throws IOException {
@@ -364,7 +335,7 @@ public class World {
             fileWriter.write("\n");
         }
         fileWriter.close();
-        System.out.println("Status: world saved.");
+//        System.out.println("Status: world saved.");
     }
     public void loadWorld(String savingName) throws FileNotFoundException {
         File saving = new File(savingName);
@@ -387,7 +358,6 @@ public class World {
                 world[i][j] = charToTile(tileString.charAt(i));
             }
         }
-        System.out.println("Status: world loaded.");
     }
 
 }
