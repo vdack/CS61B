@@ -1,23 +1,14 @@
 package byow.Core;
 
-import antlr.StringUtils;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
-import byow.TileEngine.Tileset;
 import byow.InputDemo.InputSource;
 import byow.InputDemo.StringInputDevice;
 import byow.InputDemo.KeyboardInputSource;
-import edu.princeton.cs.introcs.In;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.GenericArrayType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 
-public class
-Engine {
+public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
     public static final int WIDTH = 120;
@@ -88,14 +79,14 @@ Engine {
                 } else if (opKey == 'L') {
                     //TODO load game.
                     try {
-                        world.loadWorld("savings.dat");
+                        world.loadWorld("byow/Core/savings.dat");
                     } catch (FileNotFoundException e) {
                         throw new RuntimeException(e);
                     }
                     controlMode = GAME_MODE;
                 } else if (opKey == 'Q') {
                     try {
-                        world.saveWorld("savings.dat");
+                        world.saveWorld("byow/Core/savings.dat");
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
@@ -131,7 +122,7 @@ Engine {
                     stringBuilder.append(possibleNumber);
                 }
                 Long seedNumber = Long.parseLong(stringBuilder.toString(),10);
-                System.out.println("Status: world seed is :" + seedNumber);
+//                System.out.println("Status: world seed is :" + seedNumber);
                 world = new World(WIDTH, HEIGHT, seedNumber, WIDTH_OFFSET, HEIGHT_OFFSET);
                 world.initialize();
                 world.worldGenerate();
@@ -143,7 +134,6 @@ Engine {
             }
 //            ter.renderFrame(world.getWorld());
         }
-
         return world.getWorld();
     }
 }
