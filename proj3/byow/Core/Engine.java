@@ -5,8 +5,20 @@ import byow.TileEngine.TETile;
 import byow.InputDemo.InputSource;
 import byow.InputDemo.StringInputDevice;
 import byow.InputDemo.KeyboardInputSource;
+
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+
+
+
+import edu.princeton.cs.introcs.StdDraw;
+
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -20,6 +32,24 @@ public class Engine {
     private static final int GAME_MODE = 1;
     private static final int SEED_MODE = 2;
     private static final int QUIT_MODE = 3;
+    public static final File CWD = new File(System.getProperty("user.dir"));
+    public static final File saveFile = join(CWD, "savefiles.txt");
+
+    /**
+     * Assorted utilities.
+     * <p>
+     * Give this file a good read as it provides several useful utility functions
+     * to save you some time.
+     *
+     * @author P. N. Hilfinger
+     */
+    public static File join(String first, String... others) {
+        return Paths.get(first, others).toFile();
+    }
+
+    public static File join(File first, String... others) {
+        return Paths.get(first.getPath(), others).toFile();
+    }
 
     /**
      * Method used for exploring a fresh world. This method should handle all inputs,
@@ -78,21 +108,14 @@ public class Engine {
                     controlMode = SEED_MODE;
                 } else if (opKey == 'L') {
                     //TODO load game.
-                    try {
-                        world.loadWorld("byow/Core/savings.dat");
-                    } catch (FileNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
+                    world.loadWorld(saveFile);
                     controlMode = GAME_MODE;
                 } else if (opKey == 'Q') {
-                    try {
-                        world.saveWorld("byow/Core/savings.dat");
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    world.saveWorld(saveFile);
+
                     world.menu();
                     controlMode = QUIT_MODE;
-                } else{
+                } else {
                     //Nothing
                 }
             } else if (controlMode == GAME_MODE) {

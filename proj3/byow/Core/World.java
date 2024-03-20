@@ -322,24 +322,33 @@ public class World {
         tryMove(1, 0, avator);
     }
 
-    public void saveWorld(String savingName) throws IOException {
-        File saving = new File(savingName);
-        saving.createNewFile();
-        FileWriter fileWriter = new FileWriter(saving);
-        fileWriter.write(width+" " + height + " " + seed + " " + widthOffset + " " + heightOffset + "\n");
-        fileWriter.write(avator.getCurrentPosition().getX() + " " + avator.getCurrentPosition().getY() + " " + avator.getTileBeneath().character() + "\n");
-        for (int j = height - 1; j >= 0; j -= 1) {
-            for (int i = 0 ;i < width; i += 1) {
-                fileWriter.write(tileToChar(world[i][j]));
+    public void saveWorld(File saving){
+//        File saving = new File(savingName);
+        try {
+            saving.createNewFile();
+            FileWriter fileWriter = new FileWriter(saving);
+            fileWriter.write(width+" " + height + " " + seed + " " + widthOffset + " " + heightOffset + "\n");
+            fileWriter.write(avator.getCurrentPosition().getX() + " " + avator.getCurrentPosition().getY() + " " + avator.getTileBeneath().character() + "\n");
+            for (int j = height - 1; j >= 0; j -= 1) {
+                for (int i = 0 ;i < width; i += 1) {
+                    fileWriter.write(tileToChar(world[i][j]));
+                }
+                fileWriter.write("\n");
             }
-            fileWriter.write("\n");
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        fileWriter.close();
 //        System.out.println("Status: world saved.");
     }
-    public void loadWorld(String savingName) throws FileNotFoundException {
-        File saving = new File(savingName);
-        Scanner scanner = new Scanner(saving);
+    public void loadWorld(File saving)  {
+//        File saving = new File(savingName);
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(saving);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         String basicInfo = scanner.nextLine();
         String[] basicInformation = basicInfo.split(" ");
         this.width = Integer.parseInt(basicInformation[0]);
