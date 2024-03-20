@@ -8,10 +8,12 @@ public class Entity {
     protected int Type;
     private Position currentPosition;
     private TETile tileBeneath;
+    protected TETile image;
 
     public Entity(Position position, TETile tile) {
         this.currentPosition = position;
         this.tileBeneath = tile;
+        this.image = null;
     }
 
     public void moveTo(int x, int y, TETile tile) {
@@ -29,4 +31,7 @@ public class Entity {
         return tileBeneath;
     }
 
+    public TETile getImage(){
+        return image;
+    }
 }

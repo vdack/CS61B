@@ -8,6 +8,8 @@ import byow.InputDemo.InputSource;
 import byow.InputDemo.StringInputDevice;
 import byow.InputDemo.KeyboardInputSource;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.reflect.GenericArrayType;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +27,7 @@ Engine {
     private static final int MENU_MODE = 0;
     private static final int GAME_MODE = 1;
     private static final int SEED_MODE = 2;
+    private static final int QUIT_MODE = 3;
 
     //initial interface
     private TETile[][] menu() {
@@ -358,9 +361,9 @@ Engine {
         // that works for many different input types.
 
         int controlMode = MENU_MODE;
-        TETile[][] finalWorldFrame = menu();
-        Entity avator = null;
-        List<Entity> entities = null;
+        World world = new World(WIDTH, HEIGHT, 12345678, WIDTH_OFFSET, HEIGHT_OFFSET);
+        world.initialize();
+        world.menu();
         TERenderer ter = new TERenderer();
         ter.initialize(WIDTH, HEIGHT);
 
@@ -372,26 +375,37 @@ Engine {
                     controlMode = SEED_MODE;
                 } else if (opKey == 'L') {
                     //TODO load game.
+                    try {
+                        world.loadWorld("savings.dat");
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    controlMode = GAME_MODE;
                 } else if (opKey == 'Q') {
-                    //TODO save and exit game.
+                    try {
+                        world.saveWorld("savings.dat");
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    world.menu();
+                    controlMode = QUIT_MODE;
                 } else{
                     //Nothing
                 }
             } else if (controlMode == GAME_MODE) {
                 if (opKey == 'W') {
-                    tryMove(avator, finalWorldFrame, 0 ,1);
+                    world.avatorMoveUp();
                 } else if (opKey == 'S') {
-                    tryMove(avator, finalWorldFrame, 0 ,-1);
+                    world.avatorMoveDown();
                 } else if (opKey == 'A') {
-                    tryMove(avator, finalWorldFrame, -1 ,0);
+                    world.avatorMoveLeft();
                 } else if (opKey == 'D') {
-                    tryMove(avator, finalWorldFrame, 1 ,0);
+                    world.avatorMoveRight();
                 } else if (opKey == ':'){
                     controlMode = MENU_MODE;
                 } else {
                     //nothing
                 }
-                drawEntities(entities,finalWorldFrame);
 
             } else if (controlMode == SEED_MODE) {
                 //get seed number
@@ -405,23 +419,19 @@ Engine {
                     stringBuilder.append(possibleNumber);
                 }
                 Long seedNumber = Long.parseLong(stringBuilder.toString(),10);
-                System.out.println("current world seed is :" + seedNumber);
-                Room[][] rooms = constructRooms(seedNumber);
-                drawRooms(finalWorldFrame, rooms);
-                List<Road> roads = constructRoads(rooms);
-                drawRoads(roads, finalWorldFrame);
-                avator = placeAvator(finalWorldFrame);
-                entities = new ArrayList<>();
-                entities.add(avator);
-                drawEntities(entities, finalWorldFrame);
+                System.out.println("Status: world seed is :" + seedNumber);
+                world = new World(WIDTH, HEIGHT, seedNumber, WIDTH_OFFSET, HEIGHT_OFFSET);
+                world.initialize();
+                world.worldGenerate();
                 controlMode = GAME_MODE;
-            }
-            else {
+            } else if (controlMode == QUIT_MODE) {
+                break;
+            } else {
                 continue;
             }
-            ter.renderFrame(finalWorldFrame);
+            ter.renderFrame(world.getWorld());
         }
 
-        return finalWorldFrame;
+        return world.getWorld();
     }
 }
