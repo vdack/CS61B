@@ -56,9 +56,6 @@ integration:
 # 'make clean' will clean up stuff you can reconstruct.
 clean:
 	$(RM) *~ *.class sentinel
-	$(CD) ..
-	$(RM) -r .gitlet
-
 ### DEPENDENCIES ###
 
 sentinel: $(SRCS)

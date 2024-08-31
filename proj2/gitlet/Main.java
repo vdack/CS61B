@@ -51,9 +51,6 @@ public class Main {
         // TODO and save them into a Map.
         Map<String, String> filenameBlob = new HashMap<>();
         Commit initCommit = new Commit("initial commit", null, originDate, filenameBlob);
-        
-
-
 
     }
     private static void verifyGitlet() {
