@@ -27,8 +27,10 @@ TESTER_FLAGS =
 
 RMAKE = "$(MAKE)"
 
+TEMP_SRC = /home/vdack/temp
+SRC = /home/vdack/WorkSpace/cs61b/proj2
 # Targets that don't correspond to files, but are to be treated as commands.
-.PHONY: default check clean
+.PHONY: default check clean gitlet_clean gitlet_show gitlet_init gitlet_status
 
 default:
 	$(RMAKE) -C $(PACKAGE) default
@@ -42,3 +44,16 @@ clean:
 	$(RMAKE) -C $(PACKAGE) clean
 	$(RMAKE) -C testing clean
 
+gitlet_clean:
+	rm -r $(TEMP_SRC)/.gitlet
+
+gitlet_show:
+	tree -a $(TEMP_SRC)
+	ls $(SRC)
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main show
+
+gitlet_init:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main init
+
+gitlet_status:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main status
