@@ -64,12 +64,19 @@ public class Repository {
         writeContents(CURRENT_BRANCH, headName);
     }
 
+    public static void deleteFile(File path) {
+        if (path.exists()) {
+            path.delete();
+        }
+    }
+
     // map files:
     public static Map<String, String> readPlainFiles(File path) {
         Map<String, String> result = new HashMap<>();
         for (String fileName : plainFilenamesIn(path)) {
             File plainFile = join(path, fileName);
-            result.put(fileName, sha1(serialize(plainFile)));
+            byte[] content = readContents(plainFile);
+            result.put(fileName, sha1(content));
         }
         return result;
     }
@@ -100,4 +107,13 @@ public class Repository {
     public static List<String> getBranches() {
         return plainFilenamesIn(BRANCH_DIR);
     }
+
+    public static void stageFile(String filename) {
+        byte[] content = readContents(join(CWD, filename));
+        writeFile(filename, content, STAGE_DIR);
+    }
+    public static void unstageFile(String filename) {
+        deleteFile(join(STAGE_DIR, filename));
+    }
+
 }

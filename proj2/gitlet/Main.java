@@ -30,6 +30,7 @@ public class Main {
                 break;
             case "add":
                 // TODO: handle the `add [filename]` command
+                add(Arrays.copyOfRange(args, 1, args.length));
                 break;
                 // TODO: FILL THE REST IN
             case "commit":
@@ -112,8 +113,13 @@ public class Main {
     }
 
     private static void add(String [] filenames) {
+        Status status = new Status();
         for (String filename : filenames) {
-
+            try {
+                status.addFile(filename);
+            } catch (Exception e) {
+                Utils.message("File does not exist.");
+            }
         }
     }
 //    private static void testShowMessage() {

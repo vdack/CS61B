@@ -29,9 +29,9 @@ RMAKE = "$(MAKE)"
 
 TEMP_SRC = /home/vdack/temp
 SRC = /home/vdack/WorkSpace/cs61b/proj2
+FILE = -Wall
 # Targets that don't correspond to files, but are to be treated as commands.
-.PHONY: default check clean gitlet_clean gitlet_show gitlet_init gitlet_status
-
+.PHONY: default check clean gitlet_clean gitlet_show gitlet_init gitlet_status gitlet_add
 default:
 	$(RMAKE) -C $(PACKAGE) default
 
@@ -57,3 +57,6 @@ gitlet_init:
 
 gitlet_status:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main status
+
+gitlet_add:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main add $(FILE)
