@@ -84,8 +84,8 @@ public class Repository {
         return readObject(commitFile, Commit.class);
     }
     public static Commit readBranchCommit(String branchName) {
-        String commitName = readContentsAsString(join(BRANCH_DIR, branchName));
-        return readCommit(commitName);
+        String commitId = readContentsAsString(join(BRANCH_DIR, branchName));
+        return readCommit(commitId);
     }
     public static String readCommitId(String branchName) {
         return readContentsAsString(join(BRANCH_DIR, branchName));

@@ -1,5 +1,6 @@
 package gitlet;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
@@ -167,7 +168,14 @@ public class Main {
                 //TODO
             }
             currentCommitId = preCommitId;
-            Utils.message("Date " + commit.getDate());
+
+            Date date = commit.getDate();
+            String pattern = "EEE MMM d HH:mm:ss yyyy Z";
+            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+            sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+            String formattedDate = sdf.format(date);
+            Utils.message("Date: " +formattedDate);
+
             Utils.message(commit.getMessage());
             Utils.message("");
         }
