@@ -57,16 +57,6 @@ public class Repository {
         writeContents(newFile, content);
     }
 
-//    public static void writeBranch(String branchName, String commitName) {
-//        writeFile(branchName, commitName, BRANCH_DIR);
-//    }
-//    public static void writeCommitFile(String commitId, Commit commit) {
-//        byte[] commitContent = serialize(commit);
-//        writeFile(commitId, commitContent, COMMITS_DIR);
-//    }
-//    public static void writeCurrentBranch(String branchName) {
-//        writeContents(CURRENT_BRANCH, branchName);
-//    }
 
     public static void deleteFile(File path) {
         if (path.exists()) {
@@ -123,10 +113,13 @@ public class Repository {
         File file = join(STAGE_DIR, filename);
         byte[] content = readContents(file);
         writeFile(sha1(content), content, BLOBS_DIR);
-        file.delete();
+        deleteFile(file);
     }
     public static void unstageFile(String filename) {
         deleteFile(join(STAGE_DIR, filename));
+    }
+    public static void rmWorkFile(String filename) {
+        deleteFile(join(CWD, filename));
     }
 
     public static void writeCommit(String branchName, Commit commit) {
@@ -136,5 +129,12 @@ public class Repository {
         writeFile(branchName, commitId, BRANCH_DIR);
         writeContents(CURRENT_BRANCH, branchName);
 
+    }
+    public static void writeRemovedFiles(List<String> removedFiles) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String fileName : removedFiles) {
+            stringBuilder.append(fileName + "\n");
+        }
+        writeFile(REMOVED_FILES, stringBuilder.toString());
     }
 }

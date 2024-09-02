@@ -36,6 +36,9 @@ public class Main {
             case "commit":
                 commit(args);
                 break;
+            case "rm":
+                rm(args);
+                break;
             case "merge":
                 //TODO
                 break;
@@ -62,12 +65,7 @@ public class Main {
         // TODO write all files in current directory into blob
         // TODO and save them into a Map.
         Map<String, String> filenameBlob = new HashMap<>();
-        Commit initCommit = new Commit("initial commit", null, originDate, filenameBlob);
-
-//        String initCommitId = Utils.sha1(Utils.serialize(initCommit));
-//        Repository.writeCommitFile(initCommitId, initCommit);
-//        Repository.writeBranch("master", initCommitId);
-//        Repository.writeCurrentBranch("master");
+        Commit initCommit = new Commit("initial commit", null, null, originDate, filenameBlob);
         Repository.writeCommit("master", initCommit);
     }
 
@@ -137,6 +135,23 @@ public class Main {
         } catch (Exception err ) {
             Utils.message(err.getMessage());
         }
+    }
+
+    private static void rm(String[] args) {
+        Status status = new Status();
+        try {
+            String filename = args[1];
+            status.rm(filename);
+        } catch (Exception err) {
+            Utils.message("No reason to remove the file.");
+        }
+        List<String> stagedFiles = status.getStagedFiles();
+        List<String> commitFiles = status.getCommitFiles();
+
+    }
+
+    private static void log() {
+
     }
 //    private static void testShowMessage() {
 //        Utils.message("currentHead: " + currentHead);

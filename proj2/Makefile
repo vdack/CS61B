@@ -32,8 +32,8 @@ SRC = /home/vdack/WorkSpace/cs61b/proj2
 FILE = -Wall
 MESSAGE = -Wall
 # Targets that don't correspond to files, but are to be treated as commands.
-.PHONY: default check clean gitlet_clean gitlet_show gitlet_init gitlet_status gitlet_add
-.PHONY: commit
+.PHONY: default check clean gitlet_clean gitlet_show gitlet_init status add
+.PHONY: commit rm
 default:
 	$(RMAKE) -C $(PACKAGE) default
 
@@ -57,11 +57,14 @@ gitlet_show:
 gitlet_init:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main init
 
-gitlet_status:
+status:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main status
 
-gitlet_add:
+add:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main add $(FILE)
 
 commit:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main commit $(MESSAGE)
+
+rm:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main rm $(FILE)

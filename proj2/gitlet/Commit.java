@@ -26,14 +26,15 @@ public class Commit implements Serializable {
     final private String message;
 
     final private String preCommitId;
-
+    final private String preCommitId_2;
     final private Date date;
 
     final private Map<String, String> fileNameBlob;
 
-    public Commit (String message, String preCommitName,Date date, Map<String, String> fileNameBlob) {
+    public Commit (String message, String preCommitId, String preCommitId_2, Date date, Map<String, String> fileNameBlob) {
         this.message = message;
-        this.preCommitId = preCommitName;
+        this.preCommitId = preCommitId;
+        this.preCommitId_2 = preCommitId_2;
         this.date = date;
         this.fileNameBlob = new HashMap<String, String>(fileNameBlob);
     }

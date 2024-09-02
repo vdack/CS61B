@@ -21,7 +21,8 @@ public class Status {
 //        for (String file : currentCommit.getFileNameBlob().keySet()) {
 //            System.out.println("---" + file);
 //        }
-//        System.out.println(currentCommit.show());
+        System.out.println(currentCommit.show());
+        System.out.println("------running log------");
     }
 
     public String getCurrentBranch() {
@@ -71,6 +72,9 @@ public class Status {
         untrackedFiles.removeAll(tempFiles);
         return untrackedFiles;
     }
+    public List<String> getCommitFiles() {
+        return new ArrayList<>(this.currentCommit.getFileNameBlob().keySet());
+    }
 
     public void addFile(String filename) {
         String workingContent = working.get(filename);
@@ -80,6 +84,10 @@ public class Status {
         }
         if (!workingContent.equals(commitContent)) {
             stageFile(filename);
+            if (removed.contains(filename)) {
+                removed.remove(filename);
+                writeRemovedFiles(removed);
+            }
             return;
         }
         if (staged.containsKey(filename)) {
@@ -106,7 +114,27 @@ public class Status {
             filesToCommit.put(entry.getKey(), entry.getValue());
         }
 
-        Commit commit = new Commit(message, readCommitId(currentBranch), new Date(), filesToCommit);
+        Commit commit = new Commit(message, readCommitId(currentBranch), null, new Date(), filesToCommit);
         writeCommit(currentBranch, commit);
     }
+
+    public void rm(String filename) {
+        boolean flag = true;
+        if (staged.containsKey(filename)) {
+            unstageFile(filename);
+            flag = false;
+        }
+        if (currentCommit.getFileNameBlob().containsKey(filename)) {
+            removed.add(filename);
+            writeRemovedFiles(removed);
+            flag = false;
+        }
+        if (flag) {
+            throw new GitletException("Could not find file " + filename);
+        }
+        if (working.containsKey(filename)) {
+            rmWorkFile(filename);
+        }
+    }
+
 }
