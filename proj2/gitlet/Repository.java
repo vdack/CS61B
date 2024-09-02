@@ -83,6 +83,14 @@ public class Repository {
         File commitFile = join(COMMITS_DIR, commitId);
         return readObject(commitFile, Commit.class);
     }
+    public static Map<String, Commit> readCommits() {
+        Map<String, Commit> result = new HashMap<>();
+        for (String filename : plainFilenamesIn(COMMITS_DIR)) {
+            File commitFile = join(COMMITS_DIR, filename);
+            result.put(filename, readObject(commitFile, Commit.class));
+        }
+        return result;
+    }
     public static Commit readBranchCommit(String branchName) {
         String commitId = readContentsAsString(join(BRANCH_DIR, branchName));
         return readCommit(commitId);

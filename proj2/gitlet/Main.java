@@ -26,14 +26,11 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
                 init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
                 add(Arrays.copyOfRange(args, 1, args.length));
                 break;
-                // TODO: FILL THE REST IN
             case "commit":
                 commit(args);
                 break;
@@ -42,6 +39,9 @@ public class Main {
                 break;
             case "log":
                 log();
+                break;
+            case "global-log":
+                globalLog();
                 break;
             case "merge":
                 //TODO
@@ -162,23 +162,18 @@ public class Main {
         for (Commit commit : commits) {
             Utils.message("===");
             Utils.message("commit " + currentCommitId);
-            String preCommitId = commit.getPreCommitId();
-            String preCommitId_2 = commit.getPreCommitId_2();
-            if (preCommitId_2 != null) {
-                //TODO
-            }
-            currentCommitId = preCommitId;
-
-            Date date = commit.getDate();
-            String pattern = "EEE MMM d HH:mm:ss yyyy Z";
-            SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-            sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));
-            String formattedDate = sdf.format(date);
-            Utils.message("Date: " +formattedDate);
-
-            Utils.message(commit.getMessage());
-            Utils.message("");
+            currentCommitId = commit.getPreCommitId();
+            Utils.message(commit.toString());
         }
+    }
+    private static void globalLog() {
+        Map<String, Commit> commits = Repository.readCommits();
+        for (Map.Entry<String, Commit> entry : commits.entrySet()) {
+            Utils.message("===");
+            Utils.message("commit " + entry.getKey());
+            Utils.message(entry.getValue().toString());
+        }
+
     }
 //    private static void testShowMessage() {
 //        Utils.message("currentHead: " + currentHead);

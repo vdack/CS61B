@@ -3,9 +3,11 @@ package gitlet;
 // TODO: any imports you need here
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date; // TODO: You'll likely use this in this class
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /** Represents a gitlet commit object.
  *  TODO: It's a good idea to give a description here of what else this Class
@@ -65,6 +67,19 @@ public class Commit implements Serializable {
             result.append(entry.getKey() + ": " + entry.getValue() + "\n");
         }
         result.append("+---------------+\n");
+        return result.toString();
+    }
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        if (preCommitId_2 != null) {
+            result.append("Merge: " + preCommitId.substring(0,7) + " " + preCommitId_2.substring(0,7) + "\n");
+        }
+        String pattern = "EEE MMM d HH:mm:ss yyyy Z";
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));
+        String formattedDate = sdf.format(this.date);
+        result.append("Date: " + formattedDate + "\n");
+        result.append(message+"\n");
         return result.toString();
     }
 }
