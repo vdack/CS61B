@@ -137,4 +137,18 @@ public class Status {
         }
     }
 
+    public List<Commit> getHistoryCommits() {
+        List<Commit> commits = new ArrayList<>();
+        commits.add(currentCommit);
+        String previousCommitId = currentCommit.getPreCommitId();
+        while (previousCommitId != null) {
+            Commit previousCommit = readCommit(previousCommitId);
+            commits.add(previousCommit);
+            previousCommitId = previousCommit.getPreCommitId();
+        }
+        return commits;
+    }
+    public String getCurrentCommitId() {
+        return readCommitId(currentBranch);
+    }
 }

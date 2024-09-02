@@ -39,6 +39,9 @@ public class Main {
             case "rm":
                 rm(args);
                 break;
+            case "log":
+                log();
+                break;
             case "merge":
                 //TODO
                 break;
@@ -151,7 +154,23 @@ public class Main {
     }
 
     private static void log() {
+        Status status = new Status();
+        String currentCommitId = status.getCurrentCommitId();
+        List<Commit> commits = status.getHistoryCommits();
 
+        for (Commit commit : commits) {
+            Utils.message("===");
+            Utils.message("commit " + currentCommitId);
+            String preCommitId = commit.getPreCommitId();
+            String preCommitId_2 = commit.getPreCommitId_2();
+            if (preCommitId_2 != null) {
+                //TODO
+            }
+            currentCommitId = preCommitId;
+            Utils.message("Date " + commit.getDate());
+            Utils.message(commit.getMessage());
+            Utils.message("");
+        }
     }
 //    private static void testShowMessage() {
 //        Utils.message("currentHead: " + currentHead);

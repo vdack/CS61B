@@ -48,7 +48,7 @@ public class Commit implements Serializable {
     }
 
     public String getPreCommitId() {return preCommitId;}
-
+    public String getPreCommitId_2() {return preCommitId_2;}
     public Map<String, String> getFileNameBlob() {
         return fileNameBlob;
     }
