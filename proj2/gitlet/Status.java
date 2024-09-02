@@ -1,8 +1,6 @@
 package gitlet;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static gitlet.Repository.*;
 
@@ -20,6 +18,10 @@ public class Status {
         working = readPlainFiles(CWD);
         staged = readPlainFiles(STAGE_DIR);
         removed = readRemovedFiles();
+//        for (String file : currentCommit.getFileNameBlob().keySet()) {
+//            System.out.println("---" + file);
+//        }
+//        System.out.println(currentCommit.show());
     }
 
     public String getCurrentBranch() {
@@ -73,20 +75,38 @@ public class Status {
     public void addFile(String filename) {
         String workingContent = working.get(filename);
         String commitContent = currentCommit.getFileNameBlob().get(filename);
-
         if (workingContent == null) {
             throw new GitletException("Could not find file " + filename + " in working directory");
         }
-
         if (!workingContent.equals(commitContent)) {
             stageFile(filename);
             return;
         }
-
         if (staged.containsKey(filename)) {
             staged.remove(filename);
             unstageFile(filename);
         }
+    }
 
+
+    public void commit(String message) {
+        if (removed.isEmpty() && staged.isEmpty()) {
+            throw new GitletException("No changes added to the commit.");
+        }
+
+        Map<String, String> filesToCommit = new HashMap<>(currentCommit.getFileNameBlob());
+
+        for (String removedFile : removed) {
+            filesToCommit.remove(removedFile);
+        }
+        writeFile(REMOVED_FILES, "");
+
+        for (Map.Entry<String, String> entry : staged.entrySet()) {
+            saveFile(entry.getKey());
+            filesToCommit.put(entry.getKey(), entry.getValue());
+        }
+
+        Commit commit = new Commit(message, readCommitId(currentBranch), new Date(), filesToCommit);
+        writeCommit(currentBranch, commit);
     }
 }

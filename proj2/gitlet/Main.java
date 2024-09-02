@@ -34,7 +34,7 @@ public class Main {
                 break;
                 // TODO: FILL THE REST IN
             case "commit":
-                //TODO:
+                commit(args);
                 break;
             case "merge":
                 //TODO
@@ -64,11 +64,11 @@ public class Main {
         Map<String, String> filenameBlob = new HashMap<>();
         Commit initCommit = new Commit("initial commit", null, originDate, filenameBlob);
 
-        String initCommitName = Utils.sha1(Utils.serialize(initCommit));
-
-        Repository.writeCommit(initCommitName, initCommit);
-        Repository.writeBranch("master", initCommitName);
-        Repository.writeCurrentBranch("master");
+//        String initCommitId = Utils.sha1(Utils.serialize(initCommit));
+//        Repository.writeCommitFile(initCommitId, initCommit);
+//        Repository.writeBranch("master", initCommitId);
+//        Repository.writeCurrentBranch("master");
+        Repository.writeCommit("master", initCommit);
     }
 
     private static void verifyGitlet() {
@@ -120,6 +120,22 @@ public class Main {
             } catch (Exception e) {
                 Utils.message("File does not exist.");
             }
+        }
+    }
+
+    private static void commit(String[] args) {
+        String message = null;
+        try {
+            message = args[1];
+        } catch (Exception e) {
+            Utils.message("Please enter a commit message.");
+        }
+        Status status = new Status();
+        try {
+            status.commit(message);
+//            Utils.message("Commit successful.");
+        } catch (Exception err ) {
+            Utils.message(err.getMessage());
         }
     }
 //    private static void testShowMessage() {

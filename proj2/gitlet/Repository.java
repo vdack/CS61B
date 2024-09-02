@@ -49,20 +49,24 @@ public class Repository {
     }
 
     // write files:
-    private static void writeFile(String filename, Object content, File path) {
+    public static void writeFile(File file, Object content) {
+        writeContents(file, content);
+    }
+    public static void writeFile(String filename, Object content, File path) {
         File newFile = join(path, filename);
         writeContents(newFile, content);
     }
-    public static void writeBranch(String branchName, String commitName) {
-        writeFile(branchName, commitName, BRANCH_DIR);
-    }
-    public static void writeCommit(String commitName, Commit commit) {
-        byte[] commitContent = serialize(commit);
-        writeFile(commitName, commitContent, COMMITS_DIR);
-    }
-    public static void writeCurrentBranch(String headName) {
-        writeContents(CURRENT_BRANCH, headName);
-    }
+
+//    public static void writeBranch(String branchName, String commitName) {
+//        writeFile(branchName, commitName, BRANCH_DIR);
+//    }
+//    public static void writeCommitFile(String commitId, Commit commit) {
+//        byte[] commitContent = serialize(commit);
+//        writeFile(commitId, commitContent, COMMITS_DIR);
+//    }
+//    public static void writeCurrentBranch(String branchName) {
+//        writeContents(CURRENT_BRANCH, branchName);
+//    }
 
     public static void deleteFile(File path) {
         if (path.exists()) {
@@ -85,13 +89,16 @@ public class Repository {
     public static String readCurrentBranch() {
         return readContentsAsString(CURRENT_BRANCH);
     }
-    public static Commit readCommit(String commitName) {
-        File commitFile = join(COMMITS_DIR, commitName);
+    public static Commit readCommit(String commitId) {
+        File commitFile = join(COMMITS_DIR, commitId);
         return readObject(commitFile, Commit.class);
     }
     public static Commit readBranchCommit(String branchName) {
         String commitName = readContentsAsString(join(BRANCH_DIR, branchName));
         return readCommit(commitName);
+    }
+    public static String readCommitId(String branchName) {
+        return readContentsAsString(join(BRANCH_DIR, branchName));
     }
     public static List<String> readRemovedFiles() {
         String string = readContentsAsString(REMOVED_FILES);
@@ -112,8 +119,22 @@ public class Repository {
         byte[] content = readContents(join(CWD, filename));
         writeFile(filename, content, STAGE_DIR);
     }
+    public static void saveFile(String filename) {
+        File file = join(STAGE_DIR, filename);
+        byte[] content = readContents(file);
+        writeFile(sha1(content), content, BLOBS_DIR);
+        file.delete();
+    }
     public static void unstageFile(String filename) {
         deleteFile(join(STAGE_DIR, filename));
     }
 
+    public static void writeCommit(String branchName, Commit commit) {
+        byte[] commitContent = serialize(commit);
+        String commitId = sha1(commitContent);
+        writeFile(commitId, commitContent, COMMITS_DIR);
+        writeFile(branchName, commitId, BRANCH_DIR);
+        writeContents(CURRENT_BRANCH, branchName);
+
+    }
 }

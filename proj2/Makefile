@@ -30,8 +30,10 @@ RMAKE = "$(MAKE)"
 TEMP_SRC = /home/vdack/temp
 SRC = /home/vdack/WorkSpace/cs61b/proj2
 FILE = -Wall
+MESSAGE = -Wall
 # Targets that don't correspond to files, but are to be treated as commands.
 .PHONY: default check clean gitlet_clean gitlet_show gitlet_init gitlet_status gitlet_add
+.PHONY: commit
 default:
 	$(RMAKE) -C $(PACKAGE) default
 
@@ -60,3 +62,6 @@ gitlet_status:
 
 gitlet_add:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main add $(FILE)
+
+commit:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main commit $(MESSAGE)
