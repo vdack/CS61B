@@ -33,7 +33,7 @@ FILE = -Wall
 MESSAGE = -Wall
 # Targets that don't correspond to files, but are to be treated as commands.
 .PHONY: default check clean gitlet_clean gitlet_show gitlet_init status add
-.PHONY: commit rm log global-log
+.PHONY: commit rm log global-log find
 default:
 	$(RMAKE) -C $(PACKAGE) default
 
@@ -64,7 +64,7 @@ add:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main add $(FILE)
 
 commit:
-	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main commit $(MESSAGE)
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main commit "$(MESSAGE)"
 
 rm:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main rm $(FILE)
@@ -74,3 +74,6 @@ log:
 
 global-log:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main global-log
+
+find:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main find "$(MESSAGE)"

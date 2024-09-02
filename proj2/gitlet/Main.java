@@ -43,6 +43,9 @@ public class Main {
             case "global-log":
                 globalLog();
                 break;
+            case "find":
+                find(args);
+                break;
             case "merge":
                 //TODO
                 break;
@@ -66,8 +69,6 @@ public class Main {
         Repository.createDirectory();
 
         Date originDate = new Date(0);
-        // TODO write all files in current directory into blob
-        // TODO and save them into a Map.
         Map<String, String> filenameBlob = new HashMap<>();
         Commit initCommit = new Commit("initial commit", null, null, originDate, filenameBlob);
         Repository.writeCommit("master", initCommit);
@@ -173,7 +174,27 @@ public class Main {
             Utils.message("commit " + entry.getKey());
             Utils.message(entry.getValue().toString());
         }
+    }
 
+    private static void find(String[] args) {
+        List<String> finds = new ArrayList<>();
+        try {
+          String message = args[1];
+          Map<String, Commit> commits = Repository.readCommits();
+          for (Map.Entry<String, Commit> entry : commits.entrySet()) {
+              if (entry.getValue().getMessage().equals(message)) {
+                  finds.add(entry.getKey());
+              }
+          }
+          if (finds.isEmpty()) {
+              throw new GitletException("Not Found Anything.");
+          }
+          for (String find : finds) {
+              Utils.message(find);
+          }
+        } catch (Exception err) {
+          Utils.message("Found no commit with that message.");
+        }
     }
 //    private static void testShowMessage() {
 //        Utils.message("currentHead: " + currentHead);
