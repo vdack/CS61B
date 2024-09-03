@@ -54,6 +54,10 @@ public class Main {
                 break;
             case "checkout":
                 checkout(args);
+                break;
+            case "reset":
+                reset(args);
+                break;
             case "merge":
                 //TODO
                 break;
@@ -237,6 +241,15 @@ public class Main {
             } else {
                 throw new GitletException("Wrong number of arguments.");
             }
+        } catch (Exception err) {
+            Utils.message(err.getMessage());
+        }
+    }
+
+    private static void reset(String[] args) {
+        try {
+            Status status = new Status();
+            status.reset(args[1]);
         } catch (Exception err) {
             Utils.message(err.getMessage());
         }

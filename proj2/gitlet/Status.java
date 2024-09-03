@@ -177,15 +177,19 @@ public class Status {
 //        rmBranchFile(branchName);
         deleteFile(branchName, BRANCH_DIR);
     }
-
+    private void checkout(String filename, String blobId) {
+        byte[] content = readBlob(blobId);
+        writeWorking(filename, content);
+    }
     private void checkoutFile(Commit commit, String filename) {
         Map<String, String> filesOfCommit = commit.getFileNameBlob();
         if (!filesOfCommit.containsKey(filename)) {
             throw new GitletException("File does not exist in that commit.");
         }
         String blob = filesOfCommit.get(filename);
-        byte[] content = readBlob(blob);
-        writeWorking(filename, content);
+//        byte[] content = readBlob(blob);
+//        writeWorking(filename, content);
+        checkout(blob, filename);
     }
     public void checkoutFile(String filename) {
         checkoutFile(currentCommit, filename);
@@ -205,17 +209,46 @@ public class Status {
             throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
         }
 
-        clearDirectory(CWD);
-        clearDirectory(STAGE_DIR);
-        writeFile(REMOVED_FILES, "");
-
         Commit commit = readBranchCommit(branchName);
         Map<String, String> commitFiles = commit.getFileNameBlob();
+//        clearDirectory(CWD);
+
+        for (String filename : working.keySet()) {
+            if (!commitFiles.containsKey(filename)) {
+                deleteFile(filename, CWD);
+            }
+        }
+        clearDirectory(STAGE_DIR);
+
         for (Map.Entry<String, String> entry : commitFiles.entrySet()) {
-            byte[] content = readBlob(entry.getValue());
-            writeWorking(entry.getKey(), content);
+//            byte[] content = readBlob(entry.getValue());
+//            writeWorking(entry.getKey(), content);
+            checkout(entry.getKey(), entry.getValue());
         }
 
+        writeFile(REMOVED_FILES, "");
         writeFile(CURRENT_BRANCH, branchName);
+    }
+
+    public void reset(String commitId) {
+        Commit commit = readCommit(commitId);
+        Map<String, String> commitFiles = commit.getFileNameBlob();
+        List<String> untrackedFiles = getUntrackedFiles();
+        for (String filename : untrackedFiles) {
+            if (commitFiles.containsKey(filename)) {
+                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+            }
+        }
+        for (String filename : working.keySet()) {
+            if (!(untrackedFiles.contains(filename) || commitFiles.containsKey(filename))) {
+                deleteFile(filename, CWD);
+            }
+        }
+        for (Map.Entry<String, String> entry : commitFiles.entrySet()) {
+            checkout(entry.getKey(), entry.getValue());
+        }
+        writeFile(REMOVED_FILES, "");
+        writeFile(currentBranch, commitId, BRANCH_DIR);
+
     }
 }
