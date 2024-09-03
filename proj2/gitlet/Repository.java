@@ -64,6 +64,17 @@ public class Repository {
         }
     }
 
+    public static void clearDirectory(File dir) {
+        if (!dir.exists()) {
+            throw new GitletException("Directory does not exist: " + dir);
+        }
+        if (!dir.isDirectory()) {
+            throw new GitletException("Not a directory: " + dir);
+        }
+        for (String filename : plainFilenamesIn(dir)) {
+            deleteFile(join(dir, filename));
+        }
+    }
     // map files:
     public static Map<String, String> readPlainFiles(File path) {
         Map<String, String> result = new HashMap<>();
@@ -80,8 +91,12 @@ public class Repository {
         return readContentsAsString(CURRENT_BRANCH);
     }
     public static Commit readCommit(String commitId) {
-        File commitFile = join(COMMITS_DIR, commitId);
-        return readObject(commitFile, Commit.class);
+        try {
+            File commitFile = join(COMMITS_DIR, commitId);
+            return readObject(commitFile, Commit.class);
+        } catch (Exception err) {
+            throw new GitletException("No commit with that id exists.");
+        }
     }
     public static Map<String, Commit> readCommits() {
         Map<String, Commit> result = new HashMap<>();
@@ -107,7 +122,9 @@ public class Repository {
         List<String> result = new ArrayList<>(Arrays.asList(lines));
         return result;
     }
-
+    public static byte[] readBlob(String blobId) {
+        return readContents(join(BLOBS_DIR, blobId));
+    }
     // get all plain files in repository:
     public static List<String> getBranches() {
         return plainFilenamesIn(BRANCH_DIR);
@@ -129,6 +146,9 @@ public class Repository {
     public static void rmWorkFile(String filename) {
         deleteFile(join(CWD, filename));
     }
+    public static void rmBranchFile(String branchName) {
+        deleteFile(join(BRANCH_DIR, branchName));
+    }
 
     public static void writeCommit(String branchName, Commit commit) {
         byte[] commitContent = serialize(commit);
@@ -144,5 +164,8 @@ public class Repository {
             stringBuilder.append(fileName + "\n");
         }
         writeFile(REMOVED_FILES, stringBuilder.toString());
+    }
+    public static void writeWorking(String filename, byte[] content) {
+        writeFile(filename, content, CWD);
     }
 }

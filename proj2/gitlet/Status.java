@@ -38,9 +38,15 @@ public class Status {
         return removed;
     }
     public List<String> getModifiedFiles() {
+
         List<String> modifiedFiles = new ArrayList<>();
         List<String> tempFiles = new ArrayList<>(currentCommit.getFileNameBlob().keySet());
-        tempFiles.addAll(staged.keySet());
+//        tempFiles.addAll(staged.keySet());
+        for (String file : staged.keySet()) {
+            if (!tempFiles.contains(file)) {
+                tempFiles.add(file);
+            }
+        }
         tempFiles.removeAll(removed);
 
         for(String file : tempFiles) {
@@ -150,5 +156,61 @@ public class Status {
     }
     public String getCurrentCommitId() {
         return readCommitId(currentBranch);
+    }
+
+    public void createBranch(String branchName) {
+        if (getBranches().contains(branchName)) {
+            throw new GitletException("Branch " + branchName + " already exists");
+        }
+        writeFile(branchName, getCurrentCommitId(), BRANCH_DIR);
+    }
+    public void rmBranch(String branchName) {
+        if (!getBranches().contains(branchName)) {
+            throw new GitletException("A branch with that name does not exist.");
+        }
+        if (currentBranch.equals(branchName)) {
+            throw new GitletException("Cannot remove the current branch.");
+        }
+        rmBranchFile(branchName);
+    }
+    private void checkoutFile(Commit commit, String filename) {
+        Map<String, String> filesOfCommit = commit.getFileNameBlob();
+        if (!filesOfCommit.containsKey(filename)) {
+            throw new GitletException("File does not exist in that commit.");
+        }
+        String blob = filesOfCommit.get(filename);
+        byte[] content = readBlob(blob);
+        writeWorking(filename, content);
+    }
+    public void checkoutFile(String filename) {
+        checkoutFile(currentCommit, filename);
+    }
+    public void checkoutFile(String commitId, String filename) {
+        Commit commit = readCommit(commitId);
+        checkoutFile(commit, filename);
+    }
+    public void checkoutBranch(String branchName) {
+        if (!getBranches().contains(branchName)) {
+            throw new GitletException("No such branch exists.");
+        }
+        if (currentBranch.equals(branchName)) {
+            throw new GitletException("No need to checkout the current branch.");
+        }
+        if (!getUntrackedFiles().isEmpty()) {
+            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+
+        clearDirectory(CWD);
+        clearDirectory(STAGE_DIR);
+        writeFile(REMOVED_FILES, "");
+
+        Commit commit = readBranchCommit(branchName);
+        Map<String, String> commitFiles = commit.getFileNameBlob();
+        for (Map.Entry<String, String> entry : commitFiles.entrySet()) {
+            byte[] content = readBlob(entry.getValue());
+            writeWorking(entry.getKey(), content);
+        }
+
+        writeFile(CURRENT_BRANCH, branchName);
     }
 }

@@ -46,6 +46,14 @@ public class Main {
             case "find":
                 find(args);
                 break;
+            case "branch":
+                branch(args);
+                break;
+            case "rm-branch":
+                rmBranch(args);
+                break;
+            case "checkout":
+                checkout(args);
             case "merge":
                 //TODO
                 break;
@@ -194,6 +202,44 @@ public class Main {
           }
         } catch (Exception err) {
           Utils.message("Found no commit with that message.");
+        }
+    }
+
+    private static void branch(String[] args) {
+        Status status = new Status();
+        try {
+            status.createBranch(args[1]);
+        } catch (Exception err) {
+            Utils.message("A branch with that name already exists.");
+        }
+    }
+
+    private static void rmBranch(String[] args) {
+        Status status = new Status();
+        try {
+            status.rmBranch(args[1]);
+        } catch (Exception err) {
+            Utils.message(err.getMessage());
+        }
+    }
+
+    private static void checkout(String[] args) {
+        int length = args.length;
+        Status status = new Status();
+        try {
+            if (length == 2) {
+                status.checkoutBranch(args[1]);
+            } else if (length == 3) {
+//                assert (args[1].equals("--"));
+                status.checkoutFile(args[2]);
+            } else if (args.length == 4) {
+                // TODO checkout commit id file.
+                status.checkoutFile(args[1], args[3]);
+            } else {
+                throw new GitletException("Wrong number of arguments.");
+            }
+        } catch (Exception err) {
+            Utils.message(err.getMessage());
         }
     }
 //    private static void testShowMessage() {

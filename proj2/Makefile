@@ -31,9 +31,14 @@ TEMP_SRC = /home/vdack/temp
 SRC = /home/vdack/WorkSpace/cs61b/proj2
 FILE = -Wall
 MESSAGE = -Wall
+
+ARG = -Wall
+
+COMMAND = status
+
 # Targets that don't correspond to files, but are to be treated as commands.
 .PHONY: default check clean gitlet_clean gitlet_show gitlet_init status add
-.PHONY: commit rm log global-log find
+.PHONY: commit rm log global-log find branch rm-branch checkout gitlet
 default:
 	$(RMAKE) -C $(PACKAGE) default
 
@@ -77,3 +82,15 @@ global-log:
 
 find:
 	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main find "$(MESSAGE)"
+
+branch:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main branch $(ARG)
+
+rm-branch:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main rm-branch $(ARG)
+
+checkout:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main checkout $(ARG)
+
+gitlet:
+	java -cp $(SRC) -Duser.dir=$(TEMP_SRC) gitlet.Main $(COMMAND) $(ARG)
