@@ -230,7 +230,6 @@ public class Main {
             if (length == 2) {
                 status.checkoutBranch(args[1]);
             } else if (length == 3) {
-//                assert (args[1].equals("--"));
                 status.checkoutFile(args[2]);
             } else if (args.length == 4) {
                 // TODO checkout commit id file.
@@ -242,24 +241,4 @@ public class Main {
             Utils.message(err.getMessage());
         }
     }
-//    private static void testShowMessage() {
-//        Utils.message("currentHead: " + currentHead);
-//        Utils.message("headCommit: "  + headCommit.show());
-//        showWorkingFiles();
-//        showStagFiles();
-//    }
-//    private static void showWorkingFiles() {
-//        Utils.message("Working Files:");
-//        for (Map.Entry<String, String> entry : workingFiles.entrySet()) {
-//            Utils.message(entry.getKey() + ": " + entry.getValue());
-//        }
-//        Utils.message("------");
-//    }
-//    private static void showStagFiles() {
-//        Utils.message("Stage Files:");
-//        for (Map.Entry<String, String> entry : stageFiles.entrySet()) {
-//            Utils.message(entry.getKey() + ": " + entry.getValue());
-//        }
-//        Utils.message("------");
-//    }
 }

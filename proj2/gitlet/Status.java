@@ -98,7 +98,8 @@ public class Status {
         }
         if (staged.containsKey(filename)) {
             staged.remove(filename);
-            unstageFile(filename);
+//            unstageFile(filename);
+            deleteFile(filename, STAGE_DIR);
         }
     }
 
@@ -127,7 +128,8 @@ public class Status {
     public void rm(String filename) {
         boolean flag = true;
         if (staged.containsKey(filename)) {
-            unstageFile(filename);
+//            unstageFile(filename);
+            deleteFile(filename, STAGE_DIR);
             flag = false;
         }
         if (currentCommit.getFileNameBlob().containsKey(filename)) {
@@ -139,7 +141,8 @@ public class Status {
             throw new GitletException("Could not find file " + filename);
         }
         if (working.containsKey(filename)) {
-            rmWorkFile(filename);
+//            rmWorkFile(filename);
+            deleteFile(filename, CWD);
         }
     }
 
@@ -171,8 +174,10 @@ public class Status {
         if (currentBranch.equals(branchName)) {
             throw new GitletException("Cannot remove the current branch.");
         }
-        rmBranchFile(branchName);
+//        rmBranchFile(branchName);
+        deleteFile(branchName, BRANCH_DIR);
     }
+
     private void checkoutFile(Commit commit, String filename) {
         Map<String, String> filesOfCommit = commit.getFileNameBlob();
         if (!filesOfCommit.containsKey(filename)) {
