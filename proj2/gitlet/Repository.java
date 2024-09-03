@@ -95,6 +95,14 @@ public class Repository {
     }
     public static Commit readCommit(String commitId) {
         try {
+            if (commitId.length() == 6) {
+                for (String filename : plainFilenamesIn(COMMITS_DIR)) {
+                    if (filename.substring(0,6).equals(commitId)) {
+                        commitId = filename;
+                        break;
+                    }
+                }
+            }
             File commitFile = join(COMMITS_DIR, commitId);
             return readObject(commitFile, Commit.class);
         } catch (Exception err) {

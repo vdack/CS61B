@@ -21,8 +21,8 @@ public class Status {
 //        for (String file : currentCommit.getFileNameBlob().keySet()) {
 //            System.out.println("---" + file);
 //        }
-        System.out.println(currentCommit.show());
-        System.out.println("------running log------");
+//        System.out.println(currentCommit.show());
+//        System.out.println("------running log------");
     }
 
     public String getCurrentBranch() {
@@ -189,7 +189,7 @@ public class Status {
         String blob = filesOfCommit.get(filename);
 //        byte[] content = readBlob(blob);
 //        writeWorking(filename, content);
-        checkout(blob, filename);
+        checkout(filename, blob);
     }
     public void checkoutFile(String filename) {
         checkoutFile(currentCommit, filename);
