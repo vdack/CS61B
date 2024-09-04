@@ -18,11 +18,7 @@ public class Gitter {
         working = readPlainFiles(CWD);
         staged = readPlainFiles(STAGE_DIR);
         removed = readRemovedFiles();
-//        for (String file : currentCommit.getFileNameBlob().keySet()) {
-//            System.out.println("---" + file);
-//        }
-//        System.out.println(currentCommit.show());
-//        System.out.println("------running log------");
+
     }
 
     public String getCurrentBranch() {
@@ -47,7 +43,7 @@ public class Gitter {
 
         List<String> modifiedFiles = new ArrayList<>();
         List<String> tempFiles = new ArrayList<>(currentCommit.getFileNameBlob().keySet());
-//        tempFiles.addAll(staged.keySet());
+
         for (String file : staged.keySet()) {
             if (!tempFiles.contains(file)) {
                 tempFiles.add(file);
@@ -65,9 +61,6 @@ public class Gitter {
                 target = staged.get(file);
             }
             String current = working.get(file);
-//            System.out.println("for file: " + file);
-//            System.out.println("--- target: " + target);
-//            System.out.println("--- current: " + current);
             if (!current.equals(target)) {
                 modifiedFiles.add(file + " (modified)");
             }
@@ -108,23 +101,8 @@ public class Gitter {
             }
         } else {
             stageFile(filename);
-//            if (removed.contains(filename)) {
-//                removed.remove(filename);
-//                writeRemovedFiles(removed);
-//            }
         }
-//        if (staged.containsKey(filename)) {
-//            staged.remove(filename);
-//            deleteFile(filename, STAGE_DIR);
-//        }
 
-//        if (removed.contains(filename)) {
-//            removed.remove(filename);
-//            writeRemovedFiles(removed);
-//            stageFile(filename);
-//        } else {
-//            // TODO
-//        }
     }
 
     private void commit(String message, String preCommitId_2) {
@@ -171,15 +149,26 @@ public class Gitter {
             throw new GitletException("Could not find file " + filename);
         }
     }
-    private List<String> getHistoryCommitIds(String branchName) {
-        List<String> commitIds = new ArrayList<>();
-        String preCommitId = readCommitId(branchName);
+    private List<String> getPreCommitIds(String commitId) {
+        List<String> preCommitIds = new ArrayList<>();
+        String preCommitId = commitId;
         while (preCommitId != null) {
-            commitIds.add(preCommitId);
+            preCommitIds.add(preCommitId);
             Commit preCommit = readCommit(preCommitId);
             preCommitId = preCommit.getPreCommitId();
         }
-        return commitIds;
+        return preCommitIds;
+    }
+    private List<String> getHistoryCommitIds(String branchName) {
+//        List<String> commitIds = new ArrayList<>();
+        String preCommitId = readCommitId(branchName);
+        return getPreCommitIds(preCommitId);
+//        while (preCommitId != null) {
+//            commitIds.add(preCommitId);
+//            Commit preCommit = readCommit(preCommitId);
+//            preCommitId = preCommit.getPreCommitId();
+//        }
+//        return commitIds;
     }
     public List<Commit> getHistoryCommits() {
         List<Commit> commits = new ArrayList<>();
@@ -359,9 +348,6 @@ public class Gitter {
 
         for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
             if (entry.getValue().equals(mergedFiles.get(entry.getKey()))) {
-
-//                Utils.message("Common files:" + entry.getKey());
-
                 possibleFiles.remove(entry.getKey());
             }
         }

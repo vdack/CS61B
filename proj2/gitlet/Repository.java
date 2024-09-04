@@ -154,15 +154,6 @@ public class Repository {
         writeFile(sha1(content), content, BLOBS_DIR);
         deleteFile(file);
     }
-//    public static void unstageFile(String filename) {
-//        deleteFile(join(STAGE_DIR, filename));
-//    }
-//    public static void rmWorkFile(String filename) {
-//        deleteFile(join(CWD, filename));
-//    }
-//    public static void rmBranchFile(String branchName) {
-//        deleteFile(join(BRANCH_DIR, branchName));
-//    }
 
     public static void writeCommit(String branchName, Commit commit) {
         byte[] commitContent = serialize(commit);
