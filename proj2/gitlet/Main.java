@@ -21,6 +21,14 @@ public class Main {
             Utils.message("Please enter a command.");
             return;
         }
+        if (!Repository.gitletExists()) {
+            if (args[1].equals("init")) {
+                init();
+                return;
+            }
+            Utils.message("Not in an initialized Gitlet directory.");
+            return;
+        }
 
         String firstArg = args[0];
         switch(firstArg) {
