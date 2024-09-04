@@ -1,6 +1,5 @@
 package gitlet;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /** Driver class for Gitlet, a subset of the Git version-control system.
@@ -59,13 +58,10 @@ public class Main {
                 reset(args);
                 break;
             case "merge":
-                //TODO
+                merge(args);
                 break;
             case "status":
                 status();
-                break;
-            case "show":
-//                testShowMessage();
                 break;
             default:
                 Utils.message("No command with that name exists.");
@@ -94,11 +90,11 @@ public class Main {
     }
 
     private static void status() {
-        Status status = new Status();
+        Gitter gitter = new Gitter();
 
-        String currentHead = status.getCurrentBranch();
+        String currentHead = gitter.getCurrentBranch();
         Utils.message("=== Branches ===");
-        for (String head : status.getBranch()) {
+        for (String head : gitter.getBranch()) {
             if (head.equals(currentHead)) {
                 Utils.message("*" + head);
             } else {
@@ -107,31 +103,31 @@ public class Main {
         }
 
         Utils.message("\n=== Staged Files ===");
-        for (String fileName : status.getStagedFiles()) {
+        for (String fileName : gitter.getStagedFiles()) {
             Utils.message(fileName);
         }
 
         Utils.message("\n=== Removed Files ===");
-        for (String fileName : status.getRemovedFiles()) {
+        for (String fileName : gitter.getRemovedFiles()) {
             Utils.message(fileName);
         }
 
         Utils.message("\n=== Modifications Not Staged For Commit ===");
-        for (String fileName : status.getModifiedFiles()) {
+        for (String fileName : gitter.getModifiedFiles()) {
             Utils.message(fileName);
         }
 
         Utils.message("\n=== Untracked Files ===");
-        for (String fileName : status.getUntrackedFiles()) {
+        for (String fileName : gitter.getUntrackedFiles()) {
             Utils.message(fileName);
         }
     }
 
     private static void add(String [] filenames) {
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         for (String filename : filenames) {
             try {
-                status.addFile(filename);
+                gitter.addFile(filename);
             } catch (Exception e) {
                 Utils.message("File does not exist.");
             }
@@ -145,9 +141,9 @@ public class Main {
         } catch (Exception e) {
             Utils.message("Please enter a commit message.");
         }
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         try {
-            status.commit(message);
+            gitter.commit(message);
 //            Utils.message("Commit successful.");
         } catch (Exception err ) {
             Utils.message(err.getMessage());
@@ -155,22 +151,22 @@ public class Main {
     }
 
     private static void rm(String[] args) {
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         try {
             String filename = args[1];
-            status.rm(filename);
+            gitter.rm(filename);
         } catch (Exception err) {
             Utils.message("No reason to remove the file.");
         }
-        List<String> stagedFiles = status.getStagedFiles();
-        List<String> commitFiles = status.getCommitFiles();
+        List<String> stagedFiles = gitter.getStagedFiles();
+        List<String> commitFiles = gitter.getCommitFiles();
 
     }
 
     private static void log() {
-        Status status = new Status();
-        String currentCommitId = status.getCurrentCommitId();
-        List<Commit> commits = status.getHistoryCommits();
+        Gitter gitter = new Gitter();
+        String currentCommitId = gitter.getCurrentCommitId();
+        List<Commit> commits = gitter.getHistoryCommits();
 
         for (Commit commit : commits) {
             Utils.message("===");
@@ -210,18 +206,18 @@ public class Main {
     }
 
     private static void branch(String[] args) {
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         try {
-            status.createBranch(args[1]);
+            gitter.createBranch(args[1]);
         } catch (Exception err) {
             Utils.message("A branch with that name already exists.");
         }
     }
 
     private static void rmBranch(String[] args) {
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         try {
-            status.rmBranch(args[1]);
+            gitter.rmBranch(args[1]);
         } catch (Exception err) {
             Utils.message(err.getMessage());
         }
@@ -229,15 +225,15 @@ public class Main {
 
     private static void checkout(String[] args) {
         int length = args.length;
-        Status status = new Status();
+        Gitter gitter = new Gitter();
         try {
             if (length == 2) {
-                status.checkoutBranch(args[1]);
+                gitter.checkoutBranch(args[1]);
             } else if (length == 3) {
-                status.checkoutFile(args[2]);
+                gitter.checkoutFile(args[2]);
             } else if (args.length == 4) {
                 // TODO checkout commit id file.
-                status.checkoutFile(args[1], args[3]);
+                gitter.checkoutFile(args[1], args[3]);
             } else {
                 throw new GitletException("Wrong number of arguments.");
             }
@@ -248,10 +244,20 @@ public class Main {
 
     private static void reset(String[] args) {
         try {
-            Status status = new Status();
-            status.reset(args[1]);
+            Gitter gitter = new Gitter();
+            gitter.reset(args[1]);
         } catch (Exception err) {
             Utils.message(err.getMessage());
         }
+    }
+
+    private static void merge(String[] args) {
+//        try {
+            Gitter gitter = new Gitter();
+            String message = gitter.merge(args[1]);
+            Utils.message(message);
+//        } catch (Exception err) {
+//            Utils.message(err.getMessage());
+//        }
     }
 }

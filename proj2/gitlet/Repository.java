@@ -136,6 +136,9 @@ public class Repository {
     public static byte[] readBlob(String blobId) {
         return readContents(join(BLOBS_DIR, blobId));
     }
+    public static String readFileAsString(String filename, File dir) {
+        return readContentsAsString(join(dir, filename));
+    }
     // get all plain files in repository:
     public static List<String> getBranches() {
         return plainFilenamesIn(BRANCH_DIR);

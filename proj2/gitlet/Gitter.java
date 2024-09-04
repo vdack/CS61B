@@ -5,14 +5,14 @@ import java.util.*;
 import static gitlet.Repository.*;
 
 
-public class Status {
+public class Gitter {
     private String currentBranch;
     private Commit currentCommit;
     private List<String> removed;
     private Map<String, String> working;
     private Map<String, String> staged;
 
-    public Status() {
+    public Gitter() {
         currentBranch = readCurrentBranch();
         currentCommit = readBranchCommit(currentBranch);
         working = readPlainFiles(CWD);
@@ -29,13 +29,19 @@ public class Status {
         return currentBranch;
     }
     public List<String> getBranch() {
-        return getBranches();
+        List<String> result = getBranches();
+        Collections.sort(result);
+        return result;
     }
     public List<String> getStagedFiles() {
-        return new ArrayList<String>(staged.keySet());
+        List<String> result =  new ArrayList<String>(staged.keySet());
+        Collections.sort(result);
+        return result;
     }
     public List<String> getRemovedFiles() {
-        return removed;
+        List<String> result = new ArrayList<>(removed);
+        Collections.sort(result);
+        return result;
     }
     public List<String> getModifiedFiles() {
 
@@ -66,6 +72,7 @@ public class Status {
                 modifiedFiles.add(file + " (modified)");
             }
         }
+        Collections.sort(modifiedFiles);
         return modifiedFiles;
     }
     public List<String> getUntrackedFiles() {
@@ -76,6 +83,7 @@ public class Status {
         for(String file : tempFiles) {}
         List<String> untrackedFiles = new ArrayList<>(working.keySet());
         untrackedFiles.removeAll(tempFiles);
+        Collections.sort(untrackedFiles);
         return untrackedFiles;
     }
     public List<String> getCommitFiles() {
@@ -103,12 +111,7 @@ public class Status {
         }
     }
 
-
-    public void commit(String message) {
-        if (removed.isEmpty() && staged.isEmpty()) {
-            throw new GitletException("No changes added to the commit.");
-        }
-
+    private void commit(String message, String preCommitId_2) {
         Map<String, String> filesToCommit = new HashMap<>(currentCommit.getFileNameBlob());
 
         for (String removedFile : removed) {
@@ -121,8 +124,15 @@ public class Status {
             filesToCommit.put(entry.getKey(), entry.getValue());
         }
 
-        Commit commit = new Commit(message, readCommitId(currentBranch), null, new Date(), filesToCommit);
+        Commit commit = new Commit(message, readCommitId(currentBranch), preCommitId_2, new Date(), filesToCommit);
         writeCommit(currentBranch, commit);
+    }
+    public void commit(String message) {
+        if (removed.isEmpty() && staged.isEmpty()) {
+            throw new GitletException("No changes added to the commit.");
+        }
+
+        commit(message, null);
     }
 
     public void rm(String filename) {
@@ -145,7 +155,16 @@ public class Status {
             deleteFile(filename, CWD);
         }
     }
-
+    private List<String> getHistoryCommitIds(String branchName) {
+        List<String> commitIds = new ArrayList<>();
+        String preCommitId = readCommitId(branchName);
+        while (preCommitId != null) {
+            commitIds.add(preCommitId);
+            Commit preCommit = readCommit(preCommitId);
+            preCommitId = preCommit.getPreCommitId();
+        }
+        return commitIds;
+    }
     public List<Commit> getHistoryCommits() {
         List<Commit> commits = new ArrayList<>();
         commits.add(currentCommit);
@@ -250,5 +269,148 @@ public class Status {
         writeFile(REMOVED_FILES, "");
         writeFile(currentBranch, commitId, BRANCH_DIR);
 
+    }
+
+    private void mergeConflict(String filename, String blobA, String blobB) {
+//        Utils.message("merge conflict filename: " + filename);
+        String contentA = "";
+        if (blobA != null) {
+            contentA = readFileAsString(blobA, BLOBS_DIR);
+        }
+        String contentB = "";
+        if(blobB != null) {
+            contentB = readFileAsString(blobB, BLOBS_DIR);
+        }
+        String content = "<<<<<<< HEAD\n" + contentA + "=======\n" + contentB + ">>>>>>>";
+//        Utils.message("write content: " + content);
+        writeFile(filename, content, STAGE_DIR);
+        writeFile(filename, content, CWD);
+    }
+    public String merge(String branchName) {
+        if (!getBranches().contains(branchName)) {
+            throw new GitletException("A branch with that name does not exist.");
+        }
+        if (!(staged.isEmpty()&&removed.isEmpty())) {
+            throw new GitletException("You have uncommitted changes.");
+        }
+        if (!getUntrackedFiles().isEmpty()) {
+            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+        }
+        if (currentBranch.equals(branchName)) {
+            throw new GitletException("Cannot merge a branch with itself.");
+        }
+
+        String mergedCommitId = readCommitId(branchName);
+        String currentCommitId = readCommitId(currentBranch);
+
+        List<String> currentHistory = getHistoryCommitIds(currentBranch).reversed();
+        if (currentHistory.contains(mergedCommitId)) {
+            throw new GitletException("Given branch is an ancestor of the current branch.");
+        }
+
+        List <String> mergedHistory = getHistoryCommitIds(branchName).reversed();
+        if (mergedHistory.contains(currentCommitId)) {
+            writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
+            checkoutBranch(branchName);
+            return "Current branch fast-forwarded.";
+        }
+
+        boolean inConflict = false;
+        String spiltId = null;
+
+        for (int i = 0; i < Math.min(currentHistory.size(), mergedHistory.size()); i++) {
+            String currentId = currentHistory.get(i);
+            String mergedId = mergedHistory.get(i);
+            if (!mergedId.equals(currentId)) {
+                spiltId = currentHistory.get(i-1);
+                break;
+            }
+        }
+//        Utils.message("spilt id: " + spiltId);
+        if (spiltId == null) {
+            throw new GitletException("No common ancestor!");
+        }
+        Map<String, String> currentFiles = currentCommit.getFileNameBlob();
+        Map<String, String> mergedFiles = readCommit(mergedCommitId).getFileNameBlob();
+        Map<String, String> spiltFiles = readCommit(spiltId).getFileNameBlob();
+
+        Set<String> possibleFiles = new HashSet<>();
+        possibleFiles.addAll(currentFiles.keySet());
+        possibleFiles.addAll(mergedFiles.keySet());
+        possibleFiles.addAll(spiltFiles.keySet());
+
+        for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
+            if (entry.getValue().equals(mergedFiles.get(entry.getKey()))) {
+
+//                Utils.message("Common files:" + entry.getKey());
+
+                possibleFiles.remove(entry.getKey());
+            }
+        }
+
+        // files in possibleFiles are
+        //      either not in currentFiles
+        //      or in currentFiles but not equal to mergedFiles
+
+        for (String filename : possibleFiles) {
+
+//            Utils.message("check filename: " + filename);
+
+            String currentBlob = currentFiles.get(filename);
+            String mergedBlob = mergedFiles.get(filename);
+            String spiltBlob = spiltFiles.get(filename);
+
+//            Utils.message("spilt blob: " + spiltBlob);
+//            Utils.message("current blob: " + currentBlob);
+//            Utils.message("merge blob: " + mergedBlob);
+
+            if (currentBlob == null) {
+//                Utils.message("Current blob is null");
+                if (mergedBlob == null || mergedBlob.equals(spiltBlob)) {
+                    continue;
+                }
+                if (spiltBlob == null) {
+//                    Utils.message("Split blob is null");
+                    writeFile(filename, readBlob(mergedBlob), STAGE_DIR);
+                    writeFile(filename, readBlob(mergedBlob), CWD);
+                } else {
+//                    Utils.message("Split blob already exists and merge");
+                    mergeConflict(filename, null, mergedBlob);
+                    inConflict = true;
+                }
+            } else {
+//                Utils.message("Current blob already exists.");
+                if (spiltBlob == null) {
+//                    Utils.message("SpiltBlob is null");
+                    if (mergedBlob != null) {
+                        mergeConflict(filename, currentBlob, mergedBlob);
+                        inConflict = true;
+                    }
+                    continue;
+                }
+                if (spiltBlob.equals(currentBlob)) {
+                    if (mergedBlob != null) {
+                        writeFile(filename, readBlob(mergedBlob), STAGE_DIR);
+                        writeFile(filename, readBlob(mergedBlob), CWD);
+                    } else {
+                        removed.add(filename);
+                    }
+                } else {
+                    if (! spiltBlob.equals(mergedBlob)) {
+                        mergeConflict(filename, currentBlob, mergedBlob);
+                        inConflict = true;
+                    }
+                }
+            }
+        }
+
+        staged = readPlainFiles(STAGE_DIR);
+        commit("Merged " + branchName +" into " + currentBranch + ".", mergedCommitId);
+
+        if (inConflict) {
+            return "Encountered a merge conflict.";
+        } else {
+            return  "";
+        }
     }
 }
