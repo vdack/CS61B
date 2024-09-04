@@ -22,7 +22,7 @@ public class Main {
             return;
         }
         if (!Repository.gitletExists()) {
-            if (args[1].equals("init")) {
+            if (args[0].equals("init")) {
                 init();
                 return;
             }
