@@ -236,22 +236,25 @@ public class Gitter {
 
     public void reset(String commitId) {
         Commit commit = readCommit(commitId);
-        Map<String, String> commitFiles = commit.getFileNameBlob();
+        Map<String, String> resetFiles = commit.getFileNameBlob();
+        Map<String, String> currentFiles = currentCommit.getFileNameBlob();
+
         List<String> untrackedFiles = getUntrackedFiles();
         for (String filename : untrackedFiles) {
-            if (commitFiles.containsKey(filename)) {
+            if (resetFiles.containsKey(filename)) {
                 throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
             }
         }
-        for (String filename : working.keySet()) {
-            if (!(untrackedFiles.contains(filename) || commitFiles.containsKey(filename))) {
+        for (String filename : currentFiles.keySet()) {
+            if (!resetFiles.containsKey(filename)) {
                 deleteFile(filename, CWD);
             }
         }
-        for (Map.Entry<String, String> entry : commitFiles.entrySet()) {
+        for (Map.Entry<String, String> entry : resetFiles.entrySet()) {
             checkout(entry.getKey(), entry.getValue());
         }
         writeFile(REMOVED_FILES, "");
+        clearDirectory(STAGE_DIR);
         writeFile(currentBranch, commitId, BRANCH_DIR);
 
     }
