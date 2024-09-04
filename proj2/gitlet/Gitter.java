@@ -91,24 +91,40 @@ public class Gitter {
     }
 
     public void addFile(String filename) {
-        String workingContent = working.get(filename);
-        String commitContent = currentCommit.getFileNameBlob().get(filename);
-        if (workingContent == null) {
+        String workingBlob = working.get(filename);
+        String commitBlob = currentCommit.getFileNameBlob().get(filename);
+        if (workingBlob == null) {
             throw new GitletException("Could not find file " + filename + " in working directory");
         }
-        if (!workingContent.equals(commitContent)) {
-            stageFile(filename);
-            if (removed.contains(filename)) {
-                removed.remove(filename);
-                writeRemovedFiles(removed);
+
+        if (removed.contains(filename)) {
+            removed.remove(filename);
+            writeRemovedFiles(removed);
+        }
+
+        if (workingBlob.equals(commitBlob)) {
+            if (staged.containsKey(filename)) {
+                deleteFile(filename, STAGE_DIR);
             }
-            return;
+        } else {
+            stageFile(filename);
+//            if (removed.contains(filename)) {
+//                removed.remove(filename);
+//                writeRemovedFiles(removed);
+//            }
         }
-        if (staged.containsKey(filename)) {
-            staged.remove(filename);
-//            unstageFile(filename);
-            deleteFile(filename, STAGE_DIR);
-        }
+//        if (staged.containsKey(filename)) {
+//            staged.remove(filename);
+//            deleteFile(filename, STAGE_DIR);
+//        }
+
+//        if (removed.contains(filename)) {
+//            removed.remove(filename);
+//            writeRemovedFiles(removed);
+//            stageFile(filename);
+//        } else {
+//            // TODO
+//        }
     }
 
     private void commit(String message, String preCommitId_2) {
