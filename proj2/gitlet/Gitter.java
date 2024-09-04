@@ -221,7 +221,7 @@ public class Gitter {
         for (String fileName : untrackedFiles) {
             String untrackedBlob = working.get(fileName);
             String commitBlob = commitFiles.get(fileName);
-            if (commitBlob != null && commitBlob.equals(untrackedBlob)) {
+            if (commitBlob != null && !commitBlob.equals(untrackedBlob)) {
                 throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
             }
         }
