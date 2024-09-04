@@ -138,21 +138,19 @@ public class Gitter {
     public void rm(String filename) {
         boolean flag = true;
         if (staged.containsKey(filename)) {
-//            unstageFile(filename);
             deleteFile(filename, STAGE_DIR);
             flag = false;
         }
         if (currentCommit.getFileNameBlob().containsKey(filename)) {
             removed.add(filename);
             writeRemovedFiles(removed);
+            if (working.containsKey(filename)) {
+                deleteFile(filename, CWD);
+            }
             flag = false;
         }
         if (flag) {
             throw new GitletException("Could not find file " + filename);
-        }
-        if (working.containsKey(filename)) {
-//            rmWorkFile(filename);
-            deleteFile(filename, CWD);
         }
     }
     private List<String> getHistoryCommitIds(String branchName) {

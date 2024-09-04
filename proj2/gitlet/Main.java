@@ -121,6 +121,7 @@ public class Main {
         for (String fileName : gitter.getUntrackedFiles()) {
             Utils.message(fileName);
         }
+        Utils.message(" ");
     }
 
     private static void add(String [] filenames) {
