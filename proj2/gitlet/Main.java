@@ -258,12 +258,12 @@ public class Main {
     }
 
     private static void merge(String[] args) {
-//        try {
+        try {
             Gitter gitter = new Gitter();
             String message = gitter.merge(args[1]);
             Utils.message(message);
-//        } catch (Exception err) {
-//            Utils.message(err.getMessage());
-//        }
+        } catch (Exception err) {
+            Utils.message(err.getMessage());
+        }
     }
 }
