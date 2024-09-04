@@ -366,13 +366,11 @@ public class Gitter {
             }
         }
 
-        // files in possibleFiles are
+        //      files in possibleFiles are
         //      either not in currentFiles
         //      or in currentFiles but not equal to mergedFiles
 
         for (String filename : possibleFiles) {
-
-//            Utils.message("check filename: " + filename);
 
             String currentBlob = currentFiles.get(filename);
             String mergedBlob = mergedFiles.get(filename);
@@ -383,23 +381,18 @@ public class Gitter {
 //            Utils.message("merge blob: " + mergedBlob);
 
             if (currentBlob == null) {
-//                Utils.message("Current blob is null");
                 if (mergedBlob == null || mergedBlob.equals(spiltBlob)) {
                     continue;
                 }
                 if (spiltBlob == null) {
-//                    Utils.message("Split blob is null");
                     writeFile(filename, readBlob(mergedBlob), STAGE_DIR);
                     writeFile(filename, readBlob(mergedBlob), CWD);
                 } else {
-//                    Utils.message("Split blob already exists and merge");
                     mergeConflict(filename, null, mergedBlob);
                     inConflict = true;
                 }
             } else {
-//                Utils.message("Current blob already exists.");
                 if (spiltBlob == null) {
-//                    Utils.message("SpiltBlob is null");
                     if (mergedBlob != null) {
                         mergeConflict(filename, currentBlob, mergedBlob);
                         inConflict = true;
