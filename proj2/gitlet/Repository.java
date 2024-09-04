@@ -95,9 +95,9 @@ public class Repository {
     }
     public static Commit readCommit(String commitId) {
         try {
-            if (commitId.length() == 6) {
+            if (commitId.length() < 40) {
                 for (String filename : plainFilenamesIn(COMMITS_DIR)) {
-                    if (filename.substring(0,6).equals(commitId)) {
+                    if (filename.substring(0,commitId.length()).equals(commitId)) {
                         commitId = filename;
                         break;
                     }
