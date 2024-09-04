@@ -405,6 +405,7 @@ public class Gitter {
                         writeFile(filename, readBlob(mergedBlob), CWD);
                     } else {
                         removed.add(filename);
+                        deleteFile(filename, CWD);
                     }
                 } else {
                     if (! spiltBlob.equals(mergedBlob)) {
