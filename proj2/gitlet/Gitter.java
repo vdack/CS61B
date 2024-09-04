@@ -297,7 +297,7 @@ public class Gitter {
         if(blobB != null) {
             contentB = readFileAsString(blobB, BLOBS_DIR);
         }
-        String content = "<<<<<<< HEAD\n" + contentA + "=======\n" + contentB + "\n>>>>>>>";
+        String content = "<<<<<<< HEAD\n" + contentA + "=======\n" + contentB + ">>>>>>>\n";
 //        Utils.message("write content: " + content);
         writeFile(filename, content, STAGE_DIR);
         writeFile(filename, content, CWD);
