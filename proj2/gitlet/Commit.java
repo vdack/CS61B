@@ -23,18 +23,19 @@ public class Commit implements Serializable {
 
     /** The message of this Commit. */
     final private String message;
-
     final private String preCommitId;
     final private String preCommitId_2;
+    final private int depth;
     final private Date date;
 
     final private Map<String, String> fileNameBlob;
 
-    public Commit (String message, String preCommitId, String preCommitId_2, Date date, Map<String, String> fileNameBlob) {
+    public Commit (String message, String preCommitId, String preCommitId_2, int depth, Date date, Map<String, String> fileNameBlob) {
         this.message = message;
         this.preCommitId = preCommitId;
         this.preCommitId_2 = preCommitId_2;
         this.date = date;
+        this.depth = depth;
         this.fileNameBlob = new HashMap<String, String>(fileNameBlob);
     }
 
@@ -44,6 +45,10 @@ public class Commit implements Serializable {
 
     public Date getDate() {
         return date;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
     public String getPreCommitId() {return preCommitId;}

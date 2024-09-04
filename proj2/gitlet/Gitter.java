@@ -105,7 +105,7 @@ public class Gitter {
 
     }
 
-    private void commit(String message, String preCommitId_2) {
+    private void commit(String message, String preCommitId_2, int depth) {
         Map<String, String> filesToCommit = new HashMap<>(currentCommit.getFileNameBlob());
 
         for (String removedFile : removed) {
@@ -118,7 +118,7 @@ public class Gitter {
             filesToCommit.put(entry.getKey(), entry.getValue());
         }
 
-        Commit commit = new Commit(message, readCommitId(currentBranch), preCommitId_2, new Date(), filesToCommit);
+        Commit commit = new Commit(message, readCommitId(currentBranch), preCommitId_2, depth, new Date(), filesToCommit);
         writeCommit(currentBranch, commit);
     }
     public void commit(String message) {
@@ -128,7 +128,7 @@ public class Gitter {
         if (removed.isEmpty() && staged.isEmpty()) {
             throw new GitletException("No changes added to the commit.");
         }
-        commit(message, null);
+        commit(message, null, currentCommit.getDepth() + 1);
     }
 
     public void rm(String filename) {
@@ -337,8 +337,9 @@ public class Gitter {
         if (spiltId == null) {
             throw new GitletException("No common ancestor!");
         }
+        Commit mergedCommit = readCommit(mergedCommitId);
         Map<String, String> currentFiles = currentCommit.getFileNameBlob();
-        Map<String, String> mergedFiles = readCommit(mergedCommitId).getFileNameBlob();
+        Map<String, String> mergedFiles = mergedCommit.getFileNameBlob();
         Map<String, String> spiltFiles = readCommit(spiltId).getFileNameBlob();
 
         Set<String> possibleFiles = new HashSet<>();
@@ -403,7 +404,10 @@ public class Gitter {
         }
 
         staged = readPlainFiles(STAGE_DIR);
-        commit("Merged " + branchName +" into " + currentBranch + ".", mergedCommitId);
+        int currentDepth = currentCommit.getDepth();
+        int mergedDepth = mergedCommit.getDepth();
+        int depth = currentDepth > mergedDepth ? currentDepth : mergedDepth;
+        commit("Merged " + branchName +" into " + currentBranch + ".", mergedCommitId, depth + 1);
 
         if (inConflict) {
             return "Encountered a merge conflict.";

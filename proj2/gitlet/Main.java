@@ -78,7 +78,7 @@ public class Main {
 
         Date originDate = new Date(0);
         Map<String, String> filenameBlob = new HashMap<>();
-        Commit initCommit = new Commit("initial commit", null, null, originDate, filenameBlob);
+        Commit initCommit = new Commit("initial commit", null, null, 0,originDate, filenameBlob);
         Repository.writeCommit("master", initCommit);
     }
 
