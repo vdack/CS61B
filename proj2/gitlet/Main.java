@@ -167,9 +167,6 @@ public class Main {
         } catch (Exception err) {
             Utils.message("No reason to remove the file.");
         }
-        List<String> stagedFiles = gitter.getStagedFiles();
-        List<String> commitFiles = gitter.getCommitFiles();
-
     }
 
     private static void log() {
