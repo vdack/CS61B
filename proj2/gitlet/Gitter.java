@@ -209,16 +209,26 @@ public class Gitter {
         if (currentBranch.equals(branchName)) {
             throw new GitletException("No need to checkout the current branch.");
         }
-        if (!getUntrackedFiles().isEmpty()) {
-            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
-        }
+//        if (!getUntrackedFiles().isEmpty()) {
+//            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+//        }
 
         Commit commit = readBranchCommit(branchName);
         Map<String, String> commitFiles = commit.getFileNameBlob();
+        List<String> untrackedFiles = getUntrackedFiles();
+
+        // if untracked files will be overwritten, throw an error.
+        for (String fileName : untrackedFiles) {
+            String untrackedBlob = working.get(fileName);
+            String commitBlob = commitFiles.get(fileName);
+            if (commitBlob != null && commitBlob.equals(untrackedBlob)) {
+                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+            }
+        }
 //        clearDirectory(CWD);
 
         for (String filename : working.keySet()) {
-            if (!commitFiles.containsKey(filename)) {
+            if (!commitFiles.containsKey(filename) && !untrackedFiles.contains(filename)) {
                 deleteFile(filename, CWD);
             }
         }
