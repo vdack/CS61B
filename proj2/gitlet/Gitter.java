@@ -149,27 +149,7 @@ public class Gitter {
             throw new GitletException("Could not find file " + filename);
         }
     }
-    private List<String> getPreCommitIds(String commitId) {
-        List<String> preCommitIds = new ArrayList<>();
-        String preCommitId = commitId;
-        while (preCommitId != null) {
-            preCommitIds.add(preCommitId);
-            Commit preCommit = readCommit(preCommitId);
-            preCommitId = preCommit.getPreCommitId();
-        }
-        return preCommitIds;
-    }
-    private List<String> getHistoryCommitIds(String branchName) {
-//        List<String> commitIds = new ArrayList<>();
-        String preCommitId = readCommitId(branchName);
-        return getPreCommitIds(preCommitId);
-//        while (preCommitId != null) {
-//            commitIds.add(preCommitId);
-//            Commit preCommit = readCommit(preCommitId);
-//            preCommitId = preCommit.getPreCommitId();
-//        }
-//        return commitIds;
-    }
+
     public List<Commit> getHistoryCommits() {
         List<Commit> commits = new ArrayList<>();
         commits.add(currentCommit);
@@ -357,29 +337,6 @@ public class Gitter {
             checkoutBranch(branchName);
             return "Current branch fast-forwarded.";
         }
-//        List<String> currentHistory = getHistoryCommitIds(currentBranch);
-//        Collections.reverse(currentHistory);
-//        if (currentHistory.contains(mergedCommitId)) {
-//            throw new GitletException("Given branch is an ancestor of the current branch.");
-//        }
-//        List <String> mergedHistory = getHistoryCommitIds(branchName);
-//        Collections.reverse(mergedHistory);
-//        if (mergedHistory.contains(currentCommitId)) {
-//            writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
-//            checkoutBranch(branchName);
-//            return "Current branch fast-forwarded.";
-//        }
-//        String spiltId = null;
-//        for (int i = 0; i < Math.min(currentHistory.size(), mergedHistory.size()); i++) {
-//            String currentId = currentHistory.get(i);
-//            String mergedId = mergedHistory.get(i);
-//            if (!mergedId.equals(currentId)) {
-//                spiltId = currentHistory.get(i-1);
-//                break;
-//            }
-//        }
-
-
 
         Commit mergedCommit = readCommit(mergedCommitId);
         Map<String, String> currentFiles = currentCommit.getFileNameBlob();
@@ -396,7 +353,6 @@ public class Gitter {
                 possibleFiles.remove(entry.getKey());
             }
         }
-
         //      files in possibleFiles are
         //      either not in currentFiles
         //      or in currentFiles but not equal to mergedFiles
