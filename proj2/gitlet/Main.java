@@ -140,12 +140,12 @@ public class Main {
         try {
             message = args[1];
         } catch (Exception e) {
-            Utils.message("Please enter a commit message.");
+            message = "";
         }
+
         Gitter gitter = new Gitter();
         try {
             gitter.commit(message);
-//            Utils.message("Commit successful.");
         } catch (Exception err ) {
             Utils.message(err.getMessage());
         }
@@ -231,9 +231,14 @@ public class Main {
             if (length == 2) {
                 gitter.checkoutBranch(args[1]);
             } else if (length == 3) {
+                if (!args[1].equals("--")) {
+                    throw new GitletException("Incorrect operands.");
+                }
                 gitter.checkoutFile(args[2]);
             } else if (args.length == 4) {
-                // TODO checkout commit id file.
+                if (!args[2].equals("--")) {
+                    throw new GitletException("Incorrect operands.");
+                }
                 gitter.checkoutFile(args[1], args[3]);
             } else {
                 throw new GitletException("Wrong number of arguments.");

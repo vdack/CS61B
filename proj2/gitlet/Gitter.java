@@ -144,10 +144,12 @@ public class Gitter {
         writeCommit(currentBranch, commit);
     }
     public void commit(String message) {
+        if (message.isEmpty()) {
+            throw new GitletException("Please enter a commit message.");
+        }
         if (removed.isEmpty() && staged.isEmpty()) {
             throw new GitletException("No changes added to the commit.");
         }
-
         commit(message, null);
     }
 
