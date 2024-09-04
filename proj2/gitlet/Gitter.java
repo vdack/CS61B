@@ -303,12 +303,14 @@ public class Gitter {
         String mergedCommitId = readCommitId(branchName);
         String currentCommitId = readCommitId(currentBranch);
 
-        List<String> currentHistory = getHistoryCommitIds(currentBranch).reversed();
+        List<String> currentHistory = getHistoryCommitIds(currentBranch);
+        Collections.reverse(currentHistory);
         if (currentHistory.contains(mergedCommitId)) {
             throw new GitletException("Given branch is an ancestor of the current branch.");
         }
 
-        List <String> mergedHistory = getHistoryCommitIds(branchName).reversed();
+        List <String> mergedHistory = getHistoryCommitIds(branchName);
+        Collections.reverse(mergedHistory);
         if (mergedHistory.contains(currentCommitId)) {
             writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
             checkoutBranch(branchName);
