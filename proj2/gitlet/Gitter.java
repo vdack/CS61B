@@ -276,6 +276,29 @@ public class Gitter {
 
     }
 
+    private Map<String, Integer> getCommitDepths(String commitId) {
+        Map<String, Integer> depths = new HashMap<>();
+        Stack<String> commitIdStack = new Stack<>();
+        commitIdStack.push(commitId);
+        while (!commitIdStack.isEmpty()) {
+            String id = commitIdStack.pop();
+            if (depths.containsKey(id)) {
+                continue;
+            }
+            Commit commit = readCommit(id);
+            depths.put(id, commit.getDepth());
+            String preId = commit.getPreCommitId();
+            String preId_2 = commit.getPreCommitId_2();
+            if (preId != null) {
+                commitIdStack.push(preId);
+            }
+            if (preId_2 != null) {
+                commitIdStack.push(preId_2);
+            }
+        }
+        return depths;
+    }
+
     private void mergeConflict(String filename, String blobA, String blobB) {
 //        Utils.message("merge conflict filename: " + filename);
         String contentA = "";
@@ -308,35 +331,56 @@ public class Gitter {
         String mergedCommitId = readCommitId(branchName);
         String currentCommitId = readCommitId(currentBranch);
 
-        List<String> currentHistory = getHistoryCommitIds(currentBranch);
-        Collections.reverse(currentHistory);
-        if (currentHistory.contains(mergedCommitId)) {
+        Map<String, Integer> currentCommitDepths = getCommitDepths(currentCommitId);
+        Map<String, Integer> mergedDepths = getCommitDepths(mergedCommitId);
+
+        Set<String> commonAncestors = new HashSet<>(currentCommitDepths.keySet());
+        commonAncestors.retainAll(mergedDepths.keySet());
+
+        int maxDepth = -1;
+        String spiltId = null;
+        for (String id : commonAncestors) {
+            int depth = currentCommitDepths.get(id);
+            if (depth > maxDepth) {
+                maxDepth = depth;
+                spiltId = id;
+            }
+        }
+        if (spiltId == null) {
+            throw new GitletException("No common ancestor!");
+        }
+        if (spiltId.equals(mergedCommitId)) {
             throw new GitletException("Given branch is an ancestor of the current branch.");
         }
-
-        List <String> mergedHistory = getHistoryCommitIds(branchName);
-        Collections.reverse(mergedHistory);
-        if (mergedHistory.contains(currentCommitId)) {
+        if (spiltId.equals(currentCommitId)) {
             writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
             checkoutBranch(branchName);
             return "Current branch fast-forwarded.";
         }
+//        List<String> currentHistory = getHistoryCommitIds(currentBranch);
+//        Collections.reverse(currentHistory);
+//        if (currentHistory.contains(mergedCommitId)) {
+//            throw new GitletException("Given branch is an ancestor of the current branch.");
+//        }
+//        List <String> mergedHistory = getHistoryCommitIds(branchName);
+//        Collections.reverse(mergedHistory);
+//        if (mergedHistory.contains(currentCommitId)) {
+//            writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
+//            checkoutBranch(branchName);
+//            return "Current branch fast-forwarded.";
+//        }
+//        String spiltId = null;
+//        for (int i = 0; i < Math.min(currentHistory.size(), mergedHistory.size()); i++) {
+//            String currentId = currentHistory.get(i);
+//            String mergedId = mergedHistory.get(i);
+//            if (!mergedId.equals(currentId)) {
+//                spiltId = currentHistory.get(i-1);
+//                break;
+//            }
+//        }
 
-        boolean inConflict = false;
-        String spiltId = null;
 
-        for (int i = 0; i < Math.min(currentHistory.size(), mergedHistory.size()); i++) {
-            String currentId = currentHistory.get(i);
-            String mergedId = mergedHistory.get(i);
-            if (!mergedId.equals(currentId)) {
-                spiltId = currentHistory.get(i-1);
-                break;
-            }
-        }
-//        Utils.message("spilt id: " + spiltId);
-        if (spiltId == null) {
-            throw new GitletException("No common ancestor!");
-        }
+
         Commit mergedCommit = readCommit(mergedCommitId);
         Map<String, String> currentFiles = currentCommit.getFileNameBlob();
         Map<String, String> mergedFiles = mergedCommit.getFileNameBlob();
@@ -356,7 +400,7 @@ public class Gitter {
         //      files in possibleFiles are
         //      either not in currentFiles
         //      or in currentFiles but not equal to mergedFiles
-
+        boolean inConflict = false;
         for (String filename : possibleFiles) {
 
             String currentBlob = currentFiles.get(filename);
