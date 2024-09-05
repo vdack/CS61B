@@ -1,5 +1,7 @@
 package gitlet;
 
+import jh61b.junit.In;
+
 import java.util.*;
 
 import static gitlet.Repository.*;
@@ -281,6 +283,28 @@ public class Gitter {
         return depths;
     }
 
+    private String getSplitId(String leftId, String rightId) {
+
+        Map<String, Integer> leftDepths = getCommitDepths(leftId);
+        Map<String, Integer> rightDepths = getCommitDepths(rightId);
+        Set<String> commonAncestors = new HashSet<>(leftDepths.keySet());
+        commonAncestors.retainAll(rightDepths.keySet());
+
+        int maxDepth = -1;
+        String spiltId = null;
+        for (String id : commonAncestors) {
+            int depth = leftDepths.get(id);
+            if (depth > maxDepth) {
+                maxDepth = depth;
+                spiltId = id;
+            }
+        }
+        if (spiltId == null) {
+            throw new GitletException("No common ancestor!");
+        }
+        return spiltId;
+
+    }
     private void mergeConflict(String filename, String blobA, String blobB) {
         String contentA = "";
         if (blobA != null) {
@@ -311,24 +335,8 @@ public class Gitter {
         String mergedCommitId = readCommitId(branchName);
         String currentCommitId = readCommitId(currentBranch);
 
-        Map<String, Integer> currentCommitDepths = getCommitDepths(currentCommitId);
-        Map<String, Integer> mergedDepths = getCommitDepths(mergedCommitId);
+        String spiltId = getSplitId(currentCommitId, mergedCommitId);
 
-        Set<String> commonAncestors = new HashSet<>(currentCommitDepths.keySet());
-        commonAncestors.retainAll(mergedDepths.keySet());
-
-        int maxDepth = -1;
-        String spiltId = null;
-        for (String id : commonAncestors) {
-            int depth = currentCommitDepths.get(id);
-            if (depth > maxDepth) {
-                maxDepth = depth;
-                spiltId = id;
-            }
-        }
-        if (spiltId == null) {
-            throw new GitletException("No common ancestor!");
-        }
         if (spiltId.equals(mergedCommitId)) {
             throw new GitletException("Given branch is an ancestor of the current branch.");
         }
