@@ -1,12 +1,6 @@
 package gitlet;
-
-import jh61b.junit.In;
-
 import java.util.*;
-
 import static gitlet.Repository.*;
-
-
 public class Gitter {
     private String currentBranch;
     private Commit currentCommit;
@@ -283,10 +277,10 @@ public class Gitter {
         return depths;
     }
 
-    private String getSplitId(String leftId, String rightId) {
+    private String getSplitId(String currentId, String mergedId) {
 
-        Map<String, Integer> leftDepths = getCommitDepths(leftId);
-        Map<String, Integer> rightDepths = getCommitDepths(rightId);
+        Map<String, Integer> leftDepths = getCommitDepths(currentId);
+        Map<String, Integer> rightDepths = getCommitDepths(mergedId);
         Set<String> commonAncestors = new HashSet<>(leftDepths.keySet());
         commonAncestors.retainAll(rightDepths.keySet());
 
@@ -301,6 +295,9 @@ public class Gitter {
         }
         if (spiltId == null) {
             throw new GitletException("No common ancestor!");
+        }
+        if (spiltId.equals(mergedId)) {
+            throw new GitletException("Given branch is an ancestor of the current branch.");
         }
         return spiltId;
 
@@ -331,50 +328,32 @@ public class Gitter {
         if (currentBranch.equals(branchName)) {
             throw new GitletException("Cannot merge a branch with itself.");
         }
-
         String mergedCommitId = readCommitId(branchName);
         String currentCommitId = readCommitId(currentBranch);
-
         String spiltId = getSplitId(currentCommitId, mergedCommitId);
-
-        if (spiltId.equals(mergedCommitId)) {
-            throw new GitletException("Given branch is an ancestor of the current branch.");
-        }
         if (spiltId.equals(currentCommitId)) {
             writeFile(currentBranch, mergedCommitId, BRANCH_DIR);
             checkoutBranch(branchName);
-            return "Current branch fast-forwarded.";
+            throw new GitletException("Current branch fast-forwarded.");
         }
-
         Commit mergedCommit = readCommit(mergedCommitId);
         Map<String, String> currentFiles = currentCommit.getFileNameBlob();
         Map<String, String> mergedFiles = mergedCommit.getFileNameBlob();
         Map<String, String> spiltFiles = readCommit(spiltId).getFileNameBlob();
-
         Set<String> possibleFiles = new HashSet<>();
         possibleFiles.addAll(currentFiles.keySet());
         possibleFiles.addAll(mergedFiles.keySet());
         possibleFiles.addAll(spiltFiles.keySet());
-
         for (Map.Entry<String, String> entry : currentFiles.entrySet()) {
             if (entry.getValue().equals(mergedFiles.get(entry.getKey()))) {
                 possibleFiles.remove(entry.getKey());
             }
         }
-        //      files in possibleFiles are
-        //      either not in currentFiles
-        //      or in currentFiles but not equal to mergedFiles
         boolean inConflict = false;
         for (String filename : possibleFiles) {
-
             String currentBlob = currentFiles.get(filename);
             String mergedBlob = mergedFiles.get(filename);
             String spiltBlob = spiltFiles.get(filename);
-
-//            Utils.message("spilt blob: " + spiltBlob);
-//            Utils.message("current blob: " + currentBlob);
-//            Utils.message("merge blob: " + mergedBlob);
-
             if (currentBlob == null) {
                 if (mergedBlob == null || mergedBlob.equals(spiltBlob)) {
                     continue;
@@ -410,23 +389,9 @@ public class Gitter {
                 }
             }
         }
-
-//        staged = readPlainFiles(STAGE_DIR);
-//        int currentDepth = currentCommit.getDepth();
-//        int mergedDepth = mergedCommit.getDepth();
-//        int depth = currentDepth > mergedDepth ? currentDepth : mergedDepth;
-//        String message = "Merged " + branchName + " into " + currentBranch + ".";
-//        commit(message, mergedCommitId, depth + 1);
-//
-//        if (inConflict) {
-//            return "Encountered a merge conflict.";
-//        } else {
-//            return  "";
-//        }
         staged = readPlainFiles(STAGE_DIR);
         int depth = Math.max(currentCommit.getDepth(), mergedCommit.getDepth());
-        String message = "Merged " + branchName + " into " + currentBranch + ".";
-        commit(message, mergedCommitId, depth + 1);
+        commit("Merged " + branchName + " into " + currentBranch + ".", mergedCommitId, depth + 1);
         return inConflict ? "Encountered a merge conflict." : "";
     }
 }
