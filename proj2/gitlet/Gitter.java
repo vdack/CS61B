@@ -57,7 +57,7 @@ public class Gitter {
                 continue;
             }
             String target = currentCommit.getFileNameBlob().get(file);
-            if(staged.containsKey(file)) {
+            if (staged.containsKey(file)) {
                 target = staged.get(file);
             }
             String current = working.get(file);
@@ -73,14 +73,10 @@ public class Gitter {
         List<String> tempFiles = new ArrayList<>(currentCommit.getFileNameBlob().keySet());
         tempFiles.addAll(staged.keySet());
         tempFiles.removeAll(removed);
-        for(String file : tempFiles) {}
         List<String> untrackedFiles = new ArrayList<>(working.keySet());
         untrackedFiles.removeAll(tempFiles);
         Collections.sort(untrackedFiles);
         return untrackedFiles;
-    }
-    public List<String> getCommitFiles() {
-        return new ArrayList<>(this.currentCommit.getFileNameBlob().keySet());
     }
 
     public void addFile(String filename) {
@@ -105,7 +101,7 @@ public class Gitter {
 
     }
 
-    private void commit(String message, String preCommitId_2, int depth) {
+    private void commit(String message, String preSubCommitId, int depth) {
         Map<String, String> filesToCommit = new HashMap<>(currentCommit.getFileNameBlob());
 
         for (String removedFile : removed) {
@@ -117,8 +113,9 @@ public class Gitter {
             saveFile(entry.getKey());
             filesToCommit.put(entry.getKey(), entry.getValue());
         }
-
-        Commit commit = new Commit(message, readCommitId(currentBranch), preCommitId_2, depth, new Date(), filesToCommit);
+        String preId = readCommitId(currentBranch);
+        Date date = new Date();
+        Commit commit = new Commit(message, preId, preSubCommitId, depth, date, filesToCommit);
         writeCommit(currentBranch, commit);
     }
     public void commit(String message) {
@@ -281,7 +278,7 @@ public class Gitter {
             Commit commit = readCommit(id);
             depths.put(id, commit.getDepth());
             String preId = commit.getPreCommitId();
-            String preId_2 = commit.getPreCommitId_2();
+            String preId_2 = commit.getPreSubCommitId();
             if (preId != null) {
                 commitIdStack.push(preId);
             }

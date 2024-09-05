@@ -1,39 +1,22 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
- */
 public class Commit implements Serializable {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Commit class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided one example for `message`.
-     */
 
-    /** The message of this Commit. */
     final private String message;
     final private String preCommitId;
-    final private String preCommitId_2;
+    final private String preSubCommitId;
     final private int depth;
     final private Date date;
-
     final private Map<String, String> fileNameBlob;
 
-    public Commit (String message, String preCommitId, String preCommitId_2, int depth, Date date, Map<String, String> fileNameBlob) {
+    public Commit (String message, String preCommitId, String preSubCommitId, int depth, Date date, Map<String, String> fileNameBlob) {
         this.message = message;
         this.preCommitId = preCommitId;
-        this.preCommitId_2 = preCommitId_2;
+        this.preSubCommitId = preSubCommitId;
         this.date = date;
         this.depth = depth;
         this.fileNameBlob = new HashMap<String, String>(fileNameBlob);
@@ -52,7 +35,7 @@ public class Commit implements Serializable {
     }
 
     public String getPreCommitId() {return preCommitId;}
-    public String getPreCommitId_2() {return preCommitId_2;}
+    public String getPreSubCommitId() {return preSubCommitId;}
     public Map<String, String> getFileNameBlob() {
         return fileNameBlob;
     }
@@ -73,8 +56,13 @@ public class Commit implements Serializable {
     }
     public String toString() {
         StringBuilder result = new StringBuilder();
-        if (preCommitId_2 != null) {
-            result.append("Merge: " + preCommitId.substring(0,7) + " " + preCommitId_2.substring(0,7) + "\n");
+        if (preSubCommitId != null) {
+            result.append("Merge: ");
+            result.append(preCommitId.substring(0, 7));
+            result.append(" ");
+            result.append(preSubCommitId.substring(0, 7));
+            result.append("\n");
+
         }
         String pattern = "EEE MMM d HH:mm:ss yyyy Z";
 
