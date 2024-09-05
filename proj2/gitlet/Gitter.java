@@ -14,7 +14,6 @@ public class Gitter {
         working = readPlainFiles(CWD);
         staged = readPlainFiles(STAGE_DIR);
         removed = readRemovedFiles();
-
     }
 
     public String getCurrentBranch() {

@@ -47,18 +47,6 @@ public class Commit implements Serializable {
         return fileNameBlob;
     }
 
-    public String show() {
-        StringBuilder result = new StringBuilder();
-        result.append("message: " + message + "\n");
-        result.append("preCommitId: " + preId + "\n");
-        result.append("date: " + date + "\n");
-        result.append("------\nfile name and blobs: \n");
-        for (Map.Entry<String, String> entry : fileNameBlob.entrySet()) {
-            result.append(entry.getKey() + ": " + entry.getValue() + "\n");
-        }
-        result.append("+---------------+\n");
-        return result.toString();
-    }
     public String toString() {
         StringBuilder result = new StringBuilder();
         if (preSubId != null) {
