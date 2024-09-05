@@ -86,7 +86,7 @@ public class Repository {
             }
             File commitFile = join(COMMITS_DIR, commitId);
             return readObject(commitFile, Commit.class);
-        } catch (Exception err) {
+        } catch (IllegalArgumentException err) {
             throw new GitletException("No commit with that id exists.");
         }
     }

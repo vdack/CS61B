@@ -266,12 +266,12 @@ public class Gitter {
             Commit commit = readCommit(id);
             depths.put(id, commit.getDepth());
             String preId = commit.getPreId();
-            String preId_2 = commit.getPreSubId();
+            String preSubId = commit.getPreSubId();
             if (preId != null) {
                 commitIdStack.push(preId);
             }
-            if (preId_2 != null) {
-                commitIdStack.push(preId_2);
+            if (preSubId != null) {
+                commitIdStack.push(preSubId);
             }
         }
         return depths;
@@ -308,7 +308,7 @@ public class Gitter {
             contentA = readFileAsString(blobA, BLOBS_DIR);
         }
         String contentB = "";
-        if(blobB != null) {
+        if (blobB != null) {
             contentB = readFileAsString(blobB, BLOBS_DIR);
         }
         String content = "<<<<<<< HEAD\n" + contentA + "=======\n" + contentB + ">>>>>>>\n";
