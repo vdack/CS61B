@@ -308,7 +308,7 @@ public class Gitter {
             throw new GitletException("You have uncommitted changes.");
         }
         if (!getUntrackedFiles().isEmpty()) {
-            String m = "There is an untracked file in the way; delete it, or add and commit it first."
+            String m = "There is an untracked file in the way; delete it, or add and commit it first.";
             throw new GitletException(m);
         }
         if (currentBranch.equals(branchName)) {
