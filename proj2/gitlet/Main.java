@@ -177,7 +177,7 @@ public class Main {
         for (Commit commit : commits) {
             Utils.message("===");
             Utils.message("commit " + currentCommitId);
-            currentCommitId = commit.getPreCommitId();
+            currentCommitId = commit.getPreId();
             Utils.message(commit.toString());
         }
     }

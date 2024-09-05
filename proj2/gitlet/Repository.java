@@ -2,29 +2,11 @@ package gitlet;
 
 import java.io.File;
 import java.util.*;
-
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
-/** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
- */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
-    /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     public static final File BLOBS_DIR = join(GITLET_DIR, "blobs");
@@ -33,7 +15,6 @@ public class Repository {
 
     public static final File CURRENT_BRANCH = join(GITLET_DIR, "current_branch");
     public static final File REMOVED_FILES = join(GITLET_DIR, "removed_files");
-    /* TODO: fill in the rest of this class. */
 
     public static void createDirectory() {
         GITLET_DIR.mkdirs();
@@ -56,7 +37,6 @@ public class Repository {
         File newFile = join(path, filename);
         writeContents(newFile, content);
     }
-
 
     public static void deleteFile(File path) {
         if (path.exists()) {
@@ -97,7 +77,7 @@ public class Repository {
         try {
             if (commitId.length() < 40) {
                 for (String filename : plainFilenamesIn(COMMITS_DIR)) {
-                    if (filename.substring(0,commitId.length()).equals(commitId)) {
+                    if (filename.substring(0, commitId.length()).equals(commitId)) {
                         commitId = filename;
                         break;
                     }

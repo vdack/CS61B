@@ -51,7 +51,7 @@ public class Gitter {
         }
         tempFiles.removeAll(removed);
 
-        for(String file : tempFiles) {
+        for (String file : tempFiles) {
             if (!working.containsKey(file)) {
                 modifiedFiles.add(file + " (delete)");
                 continue;
@@ -150,11 +150,11 @@ public class Gitter {
     public List<Commit> getHistoryCommits() {
         List<Commit> commits = new ArrayList<>();
         commits.add(currentCommit);
-        String previousCommitId = currentCommit.getPreCommitId();
+        String previousCommitId = currentCommit.getPreId();
         while (previousCommitId != null) {
             Commit previousCommit = readCommit(previousCommitId);
             commits.add(previousCommit);
-            previousCommitId = previousCommit.getPreCommitId();
+            previousCommitId = previousCommit.getPreId();
         }
         return commits;
     }
@@ -206,9 +206,6 @@ public class Gitter {
         if (currentBranch.equals(branchName)) {
             throw new GitletException("No need to checkout the current branch.");
         }
-//        if (!getUntrackedFiles().isEmpty()) {
-//            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
-//        }
 
         Commit commit = readBranchCommit(branchName);
         Map<String, String> commitFiles = commit.getFileNameBlob();
@@ -277,8 +274,8 @@ public class Gitter {
             }
             Commit commit = readCommit(id);
             depths.put(id, commit.getDepth());
-            String preId = commit.getPreCommitId();
-            String preId_2 = commit.getPreSubCommitId();
+            String preId = commit.getPreId();
+            String preId_2 = commit.getPreSubId();
             if (preId != null) {
                 commitIdStack.push(preId);
             }
@@ -405,7 +402,7 @@ public class Gitter {
                         deleteFile(filename, CWD);
                     }
                 } else {
-                    if (! spiltBlob.equals(mergedBlob)) {
+                    if (!spiltBlob.equals(mergedBlob)) {
                         mergeConflict(filename, currentBlob, mergedBlob);
                         inConflict = true;
                     }
