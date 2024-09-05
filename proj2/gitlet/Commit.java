@@ -11,15 +11,18 @@ public class Commit implements Serializable {
     private final String preSubId;
     private final int depth;
     private final Date date;
-    private final Map<String, String> fileNameBlob;
+    private Map<String, String> fileNameBlob;
 
-    public Commit(String message, String preId, String preSubId, int depth, Date date, Map<String, String> blobs) {
+    public Commit(String message, String preId, String preSubId, int depth, Date date) {
         this.message = message;
         this.preId = preId;
         this.preSubId = preSubId;
         this.date = date;
         this.depth = depth;
-        this.fileNameBlob = new HashMap<>( blobs);
+        this.fileNameBlob = new HashMap<>();
+    }
+    public void attachBlob(Map<String, String> blobs) {
+        fileNameBlob.putAll(blobs);
     }
 
     public String getMessage() {

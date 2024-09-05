@@ -76,8 +76,9 @@ public class Repository {
     public static Commit readCommit(String commitId) {
         try {
             if (commitId.length() < 40) {
-                for (String filename : plainFilenamesIn(COMMITS_DIR)) {
-                    if (filename.substring(0, commitId.length()).equals(commitId)) {
+                List<String> filenames = plainFilenamesIn(COMMITS_DIR);
+                for (String filename : filenames) {
+                    if (filename.startsWith(commitId)) {
                         commitId = filename;
                         break;
                     }

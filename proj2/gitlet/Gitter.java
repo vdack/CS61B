@@ -115,7 +115,8 @@ public class Gitter {
         }
         String preId = readCommitId(currentBranch);
         Date date = new Date();
-        Commit commit = new Commit(message, preId, preSubCommitId, depth, date, filesToCommit);
+        Commit commit = new Commit(message, preId, preSubCommitId, depth, date);
+        commit.attachBlob(filesToCommit);
         writeCommit(currentBranch, commit);
     }
     public void commit(String message) {
@@ -287,7 +288,6 @@ public class Gitter {
     }
 
     private void mergeConflict(String filename, String blobA, String blobB) {
-//        Utils.message("merge conflict filename: " + filename);
         String contentA = "";
         if (blobA != null) {
             contentA = readFileAsString(blobA, BLOBS_DIR);
@@ -297,7 +297,6 @@ public class Gitter {
             contentB = readFileAsString(blobB, BLOBS_DIR);
         }
         String content = "<<<<<<< HEAD\n" + contentA + "=======\n" + contentB + ">>>>>>>\n";
-//        Utils.message("write content: " + content);
         writeFile(filename, content, STAGE_DIR);
         writeFile(filename, content, CWD);
     }
@@ -305,11 +304,12 @@ public class Gitter {
         if (!getBranches().contains(branchName)) {
             throw new GitletException("A branch with that name does not exist.");
         }
-        if (!(staged.isEmpty()&&removed.isEmpty())) {
+        if (!(staged.isEmpty() && removed.isEmpty())) {
             throw new GitletException("You have uncommitted changes.");
         }
         if (!getUntrackedFiles().isEmpty()) {
-            throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+            String m = "There is an untracked file in the way; delete it, or add and commit it first."
+            throw new GitletException(m);
         }
         if (currentBranch.equals(branchName)) {
             throw new GitletException("Cannot merge a branch with itself.");
@@ -414,7 +414,8 @@ public class Gitter {
         int currentDepth = currentCommit.getDepth();
         int mergedDepth = mergedCommit.getDepth();
         int depth = currentDepth > mergedDepth ? currentDepth : mergedDepth;
-        commit("Merged " + branchName +" into " + currentBranch + ".", mergedCommitId, depth + 1);
+        String message = "Merged " + branchName + " into " + currentBranch + ".";
+        commit(message, mergedCommitId, depth + 1);
 
         if (inConflict) {
             return "Encountered a merge conflict.";

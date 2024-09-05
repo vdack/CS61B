@@ -85,16 +85,8 @@ public class Main {
         Repository.createDirectory();
 
         Date originDate = new Date(0);
-        Map<String, String> filenameBlob = new HashMap<>();
-        Commit initCommit = new Commit("initial commit", null, null, 0,originDate, filenameBlob);
+        Commit initCommit = new Commit("initial commit", null, null, 0,originDate);
         Repository.writeCommit("master", initCommit);
-    }
-
-    private static void verifyGitlet() {
-        if (!Repository.gitletExists()) {
-            Utils.message("Not in an initialized Gitlet directory.");
-            System.exit(0);
-        }
     }
 
     private static void status() {
