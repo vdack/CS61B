@@ -176,7 +176,6 @@ public class Gitter {
         if (currentBranch.equals(branchName)) {
             throw new GitletException("Cannot remove the current branch.");
         }
-//        rmBranchFile(branchName);
         deleteFile(branchName, BRANCH_DIR);
     }
     private void checkout(String filename, String blobId) {
@@ -189,8 +188,6 @@ public class Gitter {
             throw new GitletException("File does not exist in that commit.");
         }
         String blob = filesOfCommit.get(filename);
-//        byte[] content = readBlob(blob);
-//        writeWorking(filename, content);
         checkout(filename, blob);
     }
     public void checkoutFile(String filename) {
@@ -217,10 +214,9 @@ public class Gitter {
             String untrackedBlob = working.get(fileName);
             String commitBlob = commitFiles.get(fileName);
             if (commitBlob != null && !commitBlob.equals(untrackedBlob)) {
-                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                throw new UntrackedFilesException();
             }
         }
-//        clearDirectory(CWD);
 
         for (String filename : working.keySet()) {
             if (!commitFiles.containsKey(filename) && !untrackedFiles.contains(filename)) {
@@ -230,8 +226,6 @@ public class Gitter {
         clearDirectory(STAGE_DIR);
 
         for (Map.Entry<String, String> entry : commitFiles.entrySet()) {
-//            byte[] content = readBlob(entry.getValue());
-//            writeWorking(entry.getKey(), content);
             checkout(entry.getKey(), entry.getValue());
         }
 
@@ -308,8 +302,7 @@ public class Gitter {
             throw new GitletException("You have uncommitted changes.");
         }
         if (!getUntrackedFiles().isEmpty()) {
-            String m = "There is an untracked file in the way; delete it, or add and commit it first.";
-            throw new GitletException(m);
+            throw new UntrackedFilesException();
         }
         if (currentBranch.equals(branchName)) {
             throw new GitletException("Cannot merge a branch with itself.");
