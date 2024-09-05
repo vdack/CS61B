@@ -247,7 +247,7 @@ public class Gitter {
         List<String> untrackedFiles = getUntrackedFiles();
         for (String filename : untrackedFiles) {
             if (resetFiles.containsKey(filename)) {
-                throw new GitletException("There is an untracked file in the way; delete it, or add and commit it first.");
+                throw new UntrackedFilesException();
             }
         }
         for (String filename : currentFiles.keySet()) {
