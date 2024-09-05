@@ -403,17 +403,22 @@ public class Gitter {
             }
         }
 
+//        staged = readPlainFiles(STAGE_DIR);
+//        int currentDepth = currentCommit.getDepth();
+//        int mergedDepth = mergedCommit.getDepth();
+//        int depth = currentDepth > mergedDepth ? currentDepth : mergedDepth;
+//        String message = "Merged " + branchName + " into " + currentBranch + ".";
+//        commit(message, mergedCommitId, depth + 1);
+//
+//        if (inConflict) {
+//            return "Encountered a merge conflict.";
+//        } else {
+//            return  "";
+//        }
         staged = readPlainFiles(STAGE_DIR);
-        int currentDepth = currentCommit.getDepth();
-        int mergedDepth = mergedCommit.getDepth();
-        int depth = currentDepth > mergedDepth ? currentDepth : mergedDepth;
+        int depth = Math.max(currentCommit.getDepth(), mergedCommit.getDepth());
         String message = "Merged " + branchName + " into " + currentBranch + ".";
         commit(message, mergedCommitId, depth + 1);
-
-        if (inConflict) {
-            return "Encountered a merge conflict.";
-        } else {
-            return  "";
-        }
+        return inConflict ? "Encountered a merge conflict." : "";
     }
 }
